@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('voucher_penggunaans', function (Blueprint $table) {
+            $table->integer('jumlah')->nullable()->after('penggunaan');
+            $table->integer('sudah_digunakan')->nullable()->after('jumlah');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('voucher_penggunaans', function (Blueprint $table) {
+            //
+        });
+    }
+};
