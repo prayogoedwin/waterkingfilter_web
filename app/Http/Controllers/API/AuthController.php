@@ -9,6 +9,7 @@ use App\Models\VoucherClaimHistory;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
@@ -33,7 +34,11 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required|email|unique:members',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('members')->whereNull('deleted_at'),
+            ],
             'password' => 'required|min:8',
             'confirm_password' => 'required|same:password',
             'phoneNumber' => 'required'
