@@ -7,6 +7,7 @@
     <title>Waterking Filter - Solusi Filter Air Terbaik</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/x-icon" href="{{ asset('img') }}/waterking-filter.png">
     <link
         href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
