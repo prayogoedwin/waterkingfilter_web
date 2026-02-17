@@ -27,7 +27,12 @@ use App\Middleware\CheckMaintenanceMode;
 
 Route::middleware(CheckMaintenanceMode::class)->group(function () {
 
-    Route::get('/', [PublikController::class, 'index'])->name('publik');
+    Route::get('/', function () {
+        return view('welcome');
+    });
+    Route::get('cooming-soon', function () {
+        return view('coming-soon');
+    });
     Route::get('/faq', [PublikController::class, 'faq'])->name('faq');
     Route::get('/news', [PublikController::class, 'berita'])->name('berita');
     Route::get('/news/{id}', [PublikController::class, 'berita_detail'])->name('berita.detail');

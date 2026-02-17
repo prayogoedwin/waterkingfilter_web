@@ -12,4 +12,9 @@ class MemberVoucher extends Model
     {
         return $this->belongsTo(Voucher::class);
     }
+
+    public function member()
+    {
+        return $this->belongsTo(Member::class);
+    }
 }

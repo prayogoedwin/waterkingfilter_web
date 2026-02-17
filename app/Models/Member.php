@@ -10,14 +10,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
-
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class Member extends Model implements Authenticatable
 {
-    use HasFactory, SoftDeletes, AuthenticatableTrait, CanResetPasswordTrait, LogsActivity;
+    use HasFactory, SoftDeletes, AuthenticatableTrait, CanResetPasswordTrait, LogsActivity, HasApiTokens, Notifiable;
 
     public function getActivitylogOptions(): LogOptions
     {

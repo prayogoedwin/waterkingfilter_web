@@ -44,6 +44,10 @@ return [
             'driver' => 'session',
             'provider' => 'members',
         ],
+        'api' => [
+            'driver' => 'sanctum',
+            'provider' => 'members',
+        ],
     ],
 
     /*
@@ -68,7 +72,7 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
-       'members' => [  // Provider member
+        'members' => [  // Provider member
             'driver' => 'eloquent',
             'model' => App\Models\Member::class,
         ],

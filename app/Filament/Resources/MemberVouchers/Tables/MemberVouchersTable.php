@@ -14,10 +14,10 @@ class MemberVouchersTable
     {
         return $table
             ->columns([
-                TextColumn::make('member_id')
+                TextColumn::make('member.name')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('voucher_id')
+                TextColumn::make('voucher.name')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('assigned_at')
