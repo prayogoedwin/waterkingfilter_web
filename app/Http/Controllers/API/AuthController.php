@@ -19,6 +19,7 @@ class AuthController extends Controller
             $historyOrder = Invoice::with('items', 'items.product')->where('member_id', $request->user()->id);
             $voucherHistory = VoucherClaimHistory::with('voucher', 'invoice')->where('member_id', $request->user()->id);
             return $this->ok([
+                'profile' => $request->user(),
                 'count_voucher' => $countVoucher->count(),
                 'list_voucher' => $countVoucher->get(),
                 'history_order' => $historyOrder->get(),
