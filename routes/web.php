@@ -57,7 +57,7 @@ Route::middleware(CheckMaintenanceMode::class)->group(function () {
 });
 
 Route::get('/maintenance', function () {
-    return view('maintenance');
+    return view('coming-soon');
 });
 
 Route::get('/invoice/{invoice}/print', [InvoiceController::class, 'print'])
@@ -68,7 +68,6 @@ Route::get('/invoice/{invoice}/print-struk', [InvoiceController::class, 'struk']
 
 // Login Member
 Route::prefix('member')->group(function () {
-
 
     Route::get('/login/{provider}', [SocialLoginController::class, 'redirectToProvider'])->name('member.social.login');
 
