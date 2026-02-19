@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 class CreateInvoice extends CreateRecord
 {
     protected static string $resource = InvoiceResource::class;
-
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['invoice_number'] = 'INV-' . now()->format('YmdHis');
