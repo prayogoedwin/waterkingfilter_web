@@ -36,6 +36,7 @@ class EditInvoice extends EditRecord
     }
     protected function mutateFormDataBeforeFill(array $data): array
     {
+        $invoice = Invoice::find($data['id']);
         $data['invoice_items'] = Invoice::find($data['id'])
             ->items
             ->map(fn($item) => [
@@ -45,6 +46,11 @@ class EditInvoice extends EditRecord
                 'total'      => $item->total,
             ])
             ->toArray();
+        if ($invoice->subtotal > 0) {
+            $data['discount_percent'] = ($invoice->discount / $invoice->subtotal) * 100;
+        } else {
+            $data['discount_percent'] = 0;
+        }
 
         return $data;
     }
@@ -63,27 +69,18 @@ class EditInvoice extends EditRecord
                 fn($item) => ((int) $item['qty']) * ((int) $item['price'])
             );
 
-            $discount = 0;
-            $voucherId = $data['voucher_id'] ?? null;
+            $discountPercent = (float) ($data['discount_percent'] ?? 0);
+            $discountPercent = min($discountPercent, 100); // Max 100%
 
-            if ($voucherId) {
-                $voucher = Voucher::with('jenis')->findOrFail($voucherId);
-
-                $discount = match ($voucher->jenis->jenis) {
-                    'gratis'               => $subtotal,
-                    'potongan_nominal'     => min($voucher->value, $subtotal),
-                    'potongan_persentase'  => (int) ($subtotal * ($voucher->value / 100)),
-                    default                => 0,
-                };
-            }
-
+            $discount = (int) ($subtotal * ($discountPercent / 100));
             $total = max(0, $subtotal - $discount);
 
             // Update invoice
             $record->update([
                 'member_id'  => $data['member_id'] ?? null,
-                'voucher_id' => $voucherId,
+                // 'voucher_id' => $voucherId,
                 'subtotal'   => $subtotal,
+                'discount_percent' => $discountPercent,
                 'discount'   => $discount,
                 'total'      => $total,
             ]);

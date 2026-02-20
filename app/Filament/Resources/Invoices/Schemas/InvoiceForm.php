@@ -21,6 +21,34 @@ class InvoiceForm
     {
         return $schema->schema(function () {
 
+            // $recalculate = function (callable $get, callable $set) {
+            //     $items = $get('invoice_items') ?? [];
+
+            //     $subtotal = collect($items)->sum(function ($item) {
+            //         return ((int) ($item['qty'] ?? 0)) * ((int) ($item['price'] ?? 0));
+            //     });
+
+            //     $set('subtotal', $subtotal);
+
+            //     $discount = 0;
+            //     $voucherId = $get('voucher_id');
+
+            //     if ($voucherId) {
+            //         $voucher = Voucher::with('jenis')->find($voucherId);
+
+            //         if ($voucher) {
+            //             $discount = match ($voucher->jenis->jenis) {
+            //                 'gratis' => $subtotal,
+            //                 'potongan_nominal' => min($voucher->value, $subtotal),
+            //                 'potongan_persentase' => (int) ($subtotal * ($voucher->value / 100)),
+            //                 default => 0,
+            //             };
+            //         }
+            //     }
+
+            //     $set('discount', $discount);
+            //     $set('total', max(0, $subtotal - $discount));
+            // };
             $recalculate = function (callable $get, callable $set) {
                 $items = $get('invoice_items') ?? [];
 
@@ -30,24 +58,13 @@ class InvoiceForm
 
                 $set('subtotal', $subtotal);
 
-                $discount = 0;
-                $voucherId = $get('voucher_id');
+                $discountPercent = (float) ($get('discount_percent') ?? 0);
 
-                if ($voucherId) {
-                    $voucher = Voucher::with('jenis')->find($voucherId);
+                $discountPercent = min($discountPercent, 100);
+                $discountAmount = (int) ($subtotal * ($discountPercent / 100));
 
-                    if ($voucher) {
-                        $discount = match ($voucher->jenis->jenis) {
-                            'gratis' => $subtotal,
-                            'potongan_nominal' => min($voucher->value, $subtotal),
-                            'potongan_persentase' => (int) ($subtotal * ($voucher->value / 100)),
-                            default => 0,
-                        };
-                    }
-                }
-
-                $set('discount', $discount);
-                $set('total', max(0, $subtotal - $discount));
+                $set('discount', $discountAmount);
+                $set('total', max(0, $subtotal - $discountAmount));
             };
 
             return [
@@ -58,32 +75,32 @@ class InvoiceForm
                                 Select::make('member_id')
                                     ->label('Member')
                                     ->options(Member::pluck('name', 'id'))
-                                    ->searchable()
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) use ($recalculate) {
-                                        $set('voucher_id', null);
-                                        $recalculate($get, $set);
-                                    }),
-                                Select::make('voucher_id')
-                                    ->label('Voucher')
-                                    ->searchable()
-                                    ->options(function (callable $get) {
-                                        $memberId = $get('member_id');
+                                    ->searchable(),
+                                // ->reactive()
+                                // ->afterStateUpdated(function ($state, callable $set, callable $get) use ($recalculate) {
+                                //     $set('voucher_id', null);
+                                //     $recalculate($get, $set);
+                                // }),
+                                // Select::make('voucher_id')
+                                //     ->label('Voucher')
+                                //     ->searchable()
+                                //     ->options(function (callable $get) {
+                                //         $memberId = $get('member_id');
 
-                                        if (! $memberId) {
-                                            return [];
-                                        }
+                                //         if (! $memberId) {
+                                //             return [];
+                                //         }
 
-                                        return \App\Models\MemberVoucher::query()
-                                            ->where('member_id', $memberId)
-                                            ->with('voucher')
-                                            ->get()
-                                            ->mapWithKeys(fn($mv) => [
-                                                $mv->voucher_id => $mv->voucher->name,
-                                            ]);
-                                    })
-                                    ->reactive()
-                                    ->afterStateUpdated(fn($state, $get, $set) => $recalculate($get, $set)),
+                                //         return \App\Models\MemberVoucher::query()
+                                //             ->where('member_id', $memberId)
+                                //             ->with('voucher')
+                                //             ->get()
+                                //             ->mapWithKeys(fn($mv) => [
+                                //                 $mv->voucher_id => $mv->voucher->name,
+                                //             ]);
+                                //     })
+                                //     ->reactive()
+                                //     ->afterStateUpdated(fn($state, $get, $set) => $recalculate($get, $set)),
                             ])->columns(2),
                         View::make('filament.components.product-catalog')
                             ->viewData([
@@ -107,10 +124,25 @@ class InvoiceForm
                                 ->label('Subtotal')
                                 ->numeric()
                                 ->disabled(),
+                            TextInput::make('discount_percent')
+                                ->label('Diskon (%)')
+                                ->numeric()
+                                ->default(0)
+                                ->suffix('%')
+                                ->minValue(0)
+                                ->maxValue(100)
+                                ->step(0.01)
+                                ->reactive()
+                                ->afterStateUpdated(fn($state, $get, $set) => $recalculate($get, $set))
+                                // ->hint('Masukkan persentase diskon')
+                                ->disabled(fn($context) => $context === 'view'),
+
                             TextInput::make('discount')
-                                ->label('Diskon')
+                                ->label('Nominal Diskon')
                                 ->numeric()
                                 ->disabled()
+                                // ->prefix('Rp')
+                                ->helperText('Otomatis terhitung dari %'),
                         ]),
                         TextInput::make('total')
                             ->label('Total Bayar')

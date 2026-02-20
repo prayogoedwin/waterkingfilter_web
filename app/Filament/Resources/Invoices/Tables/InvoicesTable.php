@@ -25,6 +25,9 @@ class InvoicesTable
                 TextColumn::make('subtotal')
                     ->numeric()
                     ->sortable(),
+                TextColumn::make('discount_percent')
+                    ->numeric()
+                    ->sortable(),
                 TextColumn::make('discount')
                     ->numeric()
                     ->sortable(),

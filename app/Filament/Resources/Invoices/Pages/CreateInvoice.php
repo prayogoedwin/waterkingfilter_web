@@ -40,27 +40,32 @@ class CreateInvoice extends CreateRecord
 
             /* ================= VOUCHER ================= */
 
-            $discount = 0;
-            $voucherId = $data['voucher_id'] ?? null;
+            // $discount = 0;
+            // $voucherId = $data['voucher_id'] ?? null;
 
-            if ($voucherId) {
+            // if ($voucherId) {
 
-                $voucher = Voucher::with('jenis')->findOrFail($voucherId);
+            //     $voucher = Voucher::with('jenis')->findOrFail($voucherId);
 
-                $discount = match ($voucher->jenis->jenis) {
-                    'gratis' => $subtotal,
-                    'potongan_nominal' => min($voucher->value, $subtotal),
-                    'potongan_persentase' => (int) ($subtotal * ($voucher->value / 100)),
-                    default => 0,
-                };
+            //     $discount = match ($voucher->jenis->jenis) {
+            //         'gratis' => $subtotal,
+            //         'potongan_nominal' => min($voucher->value, $subtotal),
+            //         'potongan_persentase' => (int) ($subtotal * ($voucher->value / 100)),
+            //         default => 0,
+            //     };
 
-                // Validasi kepemilikan voucher
-                MemberVoucher::where('member_id', $data['member_id'])
-                    ->where('voucher_id', $voucherId)
-                    // ->whereNull('used_at')
-                    ->lockForUpdate()
-                    ->firstOrFail();
-            }
+            //     // Validasi kepemilikan voucher
+            //     MemberVoucher::where('member_id', $data['member_id'])
+            //         ->where('voucher_id', $voucherId)
+            //         // ->whereNull('used_at')
+            //         ->lockForUpdate()
+            //         ->firstOrFail();
+            // }
+
+            $discountPercent = (float) ($data['discount_percent'] ?? 0);
+            $discountPercent = min($discountPercent, 100); // Max 100%
+
+            $discount = (int) ($subtotal * ($discountPercent / 100));
 
             $total = max(0, $subtotal - $discount);
 
@@ -70,7 +75,8 @@ class CreateInvoice extends CreateRecord
                 'invoice_number' => $data['invoice_number'],
                 'status'         => $data['status'],
                 'member_id'  => $data['member_id'] ?? null,
-                'voucher_id' => $voucherId,
+                // 'voucher_id' => $voucherId,
+                'discount_percent' => $discountPercent,
                 'subtotal'   => $subtotal,
                 'discount'   => $discount,
                 'total'      => $total,
