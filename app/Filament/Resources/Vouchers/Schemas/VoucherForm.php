@@ -6,8 +6,11 @@ use App\Models\VoucherJenis;
 use App\Models\VoucherPartner;
 use App\Models\VoucherPenggunaan;
 use App\Models\VoucherTipe;
+use Closure;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class VoucherForm
@@ -70,10 +73,29 @@ class VoucherForm
                             VoucherPenggunaan::find($get('voucher_penggunaan_id'))?->penggunaan === 'terbatas_per_user'
                     ),
                 Select::make('voucher_partner_id')
-                    ->label('Voucher Partner')
-                    ->options(VoucherPartner::query()->pluck('name', 'id'))
+                    ->label('Tipe Partner')
+                    ->relationship('voucherPartner', 'name')
                     ->required()
-                    ->searchable(),
+                    ->live()
+                    ->afterStateUpdated(fn(Set $set) => $set('partners', [])), // reset saat ganti tipe
+
+                Select::make('partners')
+                    ->label('Pilih Partner')
+                    ->relationship('partners', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->visible(fn(Get $get) => in_array(
+                        VoucherPartner::find($get('voucher_partner_id'))?->name,
+                        ['satu_partner', 'beberapa_partner']
+                    ))
+                    ->rules([
+                        fn(Get $get) => function (string $attribute, $value, Closure $fail) use ($get) {
+                            $tipe = VoucherPartner::find($get('voucher_partner_id'))?->name;
+                            if ($tipe === 'satu_partner' && count($value) > 1) {
+                                $fail('Hanya boleh memilih 1 partner.');
+                            }
+                        }
+                    ]),
             ]);
     }
 }

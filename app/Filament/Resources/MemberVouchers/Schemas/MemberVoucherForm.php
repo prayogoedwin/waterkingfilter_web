@@ -19,8 +19,7 @@ class MemberVoucherForm
                 Select::make('voucher_id')
                     ->label('Voucher')
                     ->options(
-                        Voucher::whereHas('tipe', fn($q) => $q->where('tipe', 'khusus'))
-                            ->pluck('name', 'id')
+                        Voucher::pluck('name', 'id')
                     )
                     ->required()
                     ->reactive(),
@@ -28,12 +27,7 @@ class MemberVoucherForm
                     ->label('Member Penerima Voucher')
                     // ->multiple()
                     ->options(Member::pluck('name', 'id'))
-                    ->required()
-                    ->visible(
-                        fn($get) =>
-                        $get('voucher_id') &&
-                            Voucher::find($get('voucher_id'))?->tipe?->tipe === 'khusus'
-                    ),
+                    ->required(),
                 DatePicker::make('assigned_at')
                     ->required(),
             ]);

@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class HistoryVoucherResource extends Resource
 {
@@ -21,6 +22,41 @@ class HistoryVoucherResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'VoucherClaimHistory';
+
+    public static function canAccess(): bool
+    {
+        return auth()->check() && auth()->user()->can('view history voucher');
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->check() && auth()->user()->can('view history voucher');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return auth()->check() && auth()->user()->can('view history voucher');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->check() && auth()->user()->can('create history voucher');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->check() && auth()->user()->can('edit history voucher');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->check() && auth()->user()->can('delete history voucher');
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return auth()->check() && auth()->user()->can('delete history voucher');
+    }
 
     public static function form(Schema $schema): Schema
     {

@@ -25,7 +25,8 @@ class VouchersTable
                 TextColumn::make('penggunaan.penggunaan')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('partner.name')
+                TextColumn::make('voucherPartner.name')
+                    ->label('Voucher Partner')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')

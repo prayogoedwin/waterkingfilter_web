@@ -23,7 +23,7 @@ class Voucher extends Model
         return $this->belongsTo(VoucherPenggunaan::class, 'voucher_penggunaan_id');
     }
 
-    public function partner()
+    public function voucherPartner()
     {
         return $this->belongsTo(VoucherPartner::class, 'voucher_partner_id');
     }
@@ -36,5 +36,10 @@ class Voucher extends Model
     public function invoice()
     {
         return $this->hasMany(Member::class);
+    }
+
+    public function partners()
+    {
+        return $this->belongsToMany(Partner::class, 'voucher_partner_details');
     }
 }

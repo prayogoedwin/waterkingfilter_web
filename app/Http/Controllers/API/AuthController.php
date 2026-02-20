@@ -21,10 +21,6 @@ class AuthController extends Controller
             $voucherHistory = VoucherClaimHistory::with('voucher', 'invoice')->where('member_id', $request->user()->id);
             return $this->ok([
                 'profile' => $request->user(),
-                'count_voucher' => $countVoucher->count(),
-                'list_voucher' => $countVoucher->get(),
-                'history_order' => $historyOrder->get(),
-                'voucher_claim_history' => $voucherHistory->get(),
             ]);
         } catch (Exception $e) {
             return $this->error($e->getMessage());
