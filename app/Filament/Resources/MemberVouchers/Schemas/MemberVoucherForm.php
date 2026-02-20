@@ -19,10 +19,13 @@ class MemberVoucherForm
                 Select::make('voucher_id')
                     ->label('Voucher')
                     ->options(
-                        Voucher::pluck('name', 'id')
+                        Voucher::with('jenis')
+                            ->get()
+                            ->mapWithKeys(fn($voucher) => [
+                                $voucher->id => $voucher->name . ' (' . $voucher->tipe->tipe . ')'
+                            ])
                     )
-                    ->required()
-                    ->reactive(),
+                    ->required(),
                 Select::make('member_id')
                     ->label('Member Penerima Voucher')
                     // ->multiple()
