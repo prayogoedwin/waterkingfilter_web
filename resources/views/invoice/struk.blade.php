@@ -126,9 +126,9 @@
     </div>
 
     {{-- Header Toko --}}
-    <div class="toko-name">NAMA TOKO</div>
-    <div class="toko-info">Jl. Contoh Alamat No. 1</div>
-    <div class="toko-info">Telp: 08xx-xxxx-xxxx</div>
+    <div class="toko-name">{{ str_replace('-', ' ', config('app.name')) }}</div>
+    <div class="toko-info">Jl. Letda Sujono 142, (Simpang Jl. Pancing), Medan</div>
+    <div class="toko-info">Telp: 0813 6203 3888</div>
 
     <hr class="divider">
 

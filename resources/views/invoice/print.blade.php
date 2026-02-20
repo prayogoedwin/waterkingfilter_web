@@ -208,9 +208,9 @@
     {{-- Header --}}
     <div class="header">
         <div>
-            <div class="company-name">NAMA TOKO</div>
-            <div class="company-sub">Jl. Contoh Alamat No. 1, Kota Anda</div>
-            <div class="company-sub">Telp: 08xx-xxxx-xxxx</div>
+            <div class="company-name">{{ str_replace('-', ' ', config('app.name')) }}</div>
+            <div class="company-sub">Jl. Letda Sujono 142, (Simpang Jl. Pancing), Medan</div>
+            <div class="company-sub">Telp: 0813 6203 3888</div>
         </div>
         <div class="invoice-meta">
             <h2>INVOICE</h2>
