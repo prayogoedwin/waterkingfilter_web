@@ -66,10 +66,8 @@ class AuthController extends Controller
         try {
             $member = Member::where('email', $request->email)->first();
 
-            if (! $member || ! Hash::check($request->password, $member->password)) {
-                return response()->json([
-                    'message' => 'Email atau password salah'
-                ], 401);
+            if (!$member || !Hash::check($request->password, $member->password)) {
+                return $this->notFound('The provided credentials are incorrect.');
             }
 
             $token = $member->createToken('member-token')->plainTextToken;
