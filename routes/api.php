@@ -24,5 +24,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('history-order', [IndexController::class, 'historyOrder']);
     Route::get('history-voucher', [IndexController::class, 'historyVoucher']);
     Route::get('detail-voucher/{id}', [IndexController::class, 'detailVoucher']);
+    Route::get('counting-partner', [IndexController::class, 'detailPartner']);
 });
 Route::apiResource('product', ProductController::class);
