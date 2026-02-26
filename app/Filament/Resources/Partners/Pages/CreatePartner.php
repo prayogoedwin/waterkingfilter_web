@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Partners\Pages;
 
 use App\Filament\Resources\Partners\PartnerResource;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Facades\Hash;
 
 class CreatePartner extends CreateRecord
 {
@@ -11,8 +12,7 @@ class CreatePartner extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['type'] = 'partner';
-
+        $data['password'] = Hash::make('partner');
         return $data;
     }
 }

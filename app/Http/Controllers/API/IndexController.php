@@ -13,6 +13,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class IndexController extends Controller
 {
@@ -105,7 +106,24 @@ class IndexController extends Controller
     public function historyOrder(Request $request)
     {
         try {
-            $historyOrder = Invoice::with('items', 'items.product')->where('member_id', $request->user()->id)->get();
+
+            $historyOrder = Invoice::with('items', 'items.product')
+                ->where('member_id', $request->user()->id)
+                ->get();
+
+            $historyOrder->each(function ($invoice) {
+                $invoice->items->each(function ($item) {
+
+                    if ($item->product && $item->product->image) {
+                        if (!Str::startsWith($item->product->image, ['http://', 'https://'])) {
+                            $item->product->image_url = asset('storage/' . $item->product->image);
+                        } else {
+                            $item->product->image_url = $item->product->image;
+                        }
+                    }
+                });
+            });
+
             return $this->ok($historyOrder);
         } catch (Exception $e) {
             return $this->error($e->getMessage());

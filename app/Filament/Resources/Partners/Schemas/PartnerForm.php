@@ -13,6 +13,9 @@ class PartnerForm
         return $schema
             ->components([
                 TextInput::make('name')->required(),
+                TextInput::make('email')->required()
+                    ->email()
+                    ->unique('partners', 'email'),
                 FileUpload::make('image')
                     ->image()
                     ->disk('public')
