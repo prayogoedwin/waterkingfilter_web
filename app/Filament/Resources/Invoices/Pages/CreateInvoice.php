@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Invoices\Pages;
 
 use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Models\Invoice;
+use App\Models\Member;
 use App\Models\MemberVoucher;
 use App\Models\Voucher;
 use App\Models\VoucherClaimHistory;
@@ -68,6 +69,12 @@ class CreateInvoice extends CreateRecord
             $discount = (int) ($subtotal * ($discountPercent / 100));
 
             $total = max(0, $subtotal - $discount);
+
+            /* ================= POIN MEMBER ================= */
+
+            $member = Member::find($data['member_id']);
+            $member->poin_terkini = $member->poin_terkini + $data['tambahan_poin'];
+            $member->save();
 
             /* ================= INVOICE ================= */
 

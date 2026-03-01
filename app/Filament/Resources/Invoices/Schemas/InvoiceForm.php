@@ -143,6 +143,10 @@ class InvoiceForm
                                 ->disabled()
                                 // ->prefix('Rp')
                                 ->helperText('Otomatis terhitung dari %'),
+                            TextInput::make('tambahan_poin')
+                                ->numeric()
+                                ->label('Poin Member')
+                                ->visible(fn($context) => $context === 'create')
                         ]),
                         TextInput::make('total')
                             ->label('Total Bayar')

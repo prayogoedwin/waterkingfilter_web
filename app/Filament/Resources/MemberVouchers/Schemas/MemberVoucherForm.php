@@ -19,7 +19,10 @@ class MemberVoucherForm
                 Select::make('voucher_id')
                     ->label('Voucher')
                     ->options(
-                        Voucher::with('jenis')
+                        Voucher::with('tipe')
+                            ->whereHas('tipe', function ($q) {
+                                $q->where('tipe', 'khusus');
+                            })
                             ->get()
                             ->mapWithKeys(fn($voucher) => [
                                 $voucher->id => $voucher->name . ' (' . $voucher->tipe->tipe . ')'
