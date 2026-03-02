@@ -48,6 +48,10 @@ return [
             'driver' => 'sanctum',
             'provider' => 'members',
         ],
+        'partner-api' => [
+            'driver' => 'sanctum',
+            'provider' => 'partners',
+        ],
     ],
 
     /*
@@ -75,6 +79,10 @@ return [
         'members' => [  // Provider member
             'driver' => 'eloquent',
             'model' => App\Models\Member::class,
+        ],
+        'partners' => [  // Provider partner
+            'driver' => 'eloquent',
+            'model' => App\Models\Partner::class,
         ],
 
         // 'users' => [

@@ -189,8 +189,14 @@ class IndexController extends Controller
     public function detailPartner(Request $request)
     {
         try {
-            $partner = Partner::with('vouchers')->where('id', $request->user()->partner_id)->first();
-            return $this->ok($partner);
+            $countVoucher = VoucherPartnerDetail::where('partner_id', $request->user()->id)->count();
+            $claim = VoucherClaimHistory::where('partner_id', $request->user()->id)->count();
+            $sisa = $countVoucher - $claim;
+            return $this->ok([
+                'jumlah_voucher' => $countVoucher,
+                'jumlah_claim' => $claim,
+                'sisa' => $sisa
+            ]);
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
