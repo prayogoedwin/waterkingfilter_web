@@ -76,6 +76,19 @@ class InvoiceForm
                                     ->label('Member')
                                     ->options(Member::pluck('name', 'id'))
                                     ->searchable(),
+                                Select::make('voucher_id')
+                                    ->label('Voucher')
+                                    ->options(
+                                        Voucher::with('tipe')
+                                            ->whereHas('tipe', function ($q) {
+                                                $q->where('tipe', 'khusus');
+                                            })
+                                            ->get()
+                                            ->mapWithKeys(fn($voucher) => [
+                                                $voucher->id => $voucher->name . ' (' . $voucher->tipe->tipe . ')'
+                                            ])
+                                    )
+                                    ->required(),
                                 // ->reactive()
                                 // ->afterStateUpdated(function ($state, callable $set, callable $get) use ($recalculate) {
                                 //     $set('voucher_id', null);

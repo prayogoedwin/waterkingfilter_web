@@ -82,7 +82,7 @@ class CreateInvoice extends CreateRecord
                 'invoice_number' => $data['invoice_number'],
                 'status'         => $data['status'],
                 'member_id'  => $data['member_id'] ?? null,
-                // 'voucher_id' => $voucherId,
+                'voucher_id' => $data['voucher_id'] ?? null,
                 'discount_percent' => $discountPercent,
                 'subtotal'   => $subtotal,
                 'discount'   => $discount,
@@ -102,27 +102,36 @@ class CreateInvoice extends CreateRecord
 
             /* ================= MARK VOUCHER USED ================= */
 
-            if ($invoice->voucher_id) {
+            // if ($invoice->voucher_id) {
 
-                $voucher = Voucher::with('jenis')->find($invoice->voucher_id);
+            //     $voucher = Voucher::with('jenis')->find($invoice->voucher_id);
 
-                VoucherClaimHistory::create([
-                    'voucher_id' => $voucher->id,
-                    'member_id' => $invoice->member_id,
-                    'invoice_id' => $invoice->id,
+            //     VoucherClaimHistory::create([
+            //         'voucher_id' => $voucher->id,
+            //         'member_id' => $invoice->member_id,
+            //         'invoice_id' => $invoice->id,
 
-                    // snapshot voucher
-                    'voucher_name' => $voucher->name,
-                    'voucher_jenis' => $voucher->jenis->jenis,
-                    'voucher_value' => $voucher->value,
-                    'dicount_amount' => $invoice->discount,
+            //         // snapshot voucher
+            //         'voucher_name' => $voucher->name,
+            //         'voucher_jenis' => $voucher->jenis->jenis,
+            //         'voucher_value' => $voucher->value,
+            //         'dicount_amount' => $invoice->discount,
 
-                    // transaksi
-                    'subtotal' => $invoice->subtotal,
-                    'total_before_discount' => $invoice->subtotal,
-                    'total_after_discount' => $invoice->total,
+            //         // transaksi
+            //         'subtotal' => $invoice->subtotal,
+            //         'total_before_discount' => $invoice->subtotal,
+            //         'total_after_discount' => $invoice->total,
 
-                    'claim_at' => now(),
+            //         'claim_at' => now(),
+            //     ]);
+            // }
+
+            /* ================= ADD INVOICE TO MEMBER IF EXIST ================= */
+            if (isset($data['voucher_id'])) {
+                MemberVoucher::create([
+                    'member_id' => $data['member_id'],
+                    'voucher_id' => $data['voucher_id'],
+                    'assigned_at' => now(),
                 ]);
             }
 

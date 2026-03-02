@@ -7,6 +7,7 @@ use App\Models\VoucherPartner;
 use App\Models\VoucherPenggunaan;
 use App\Models\VoucherTipe;
 use Closure;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
@@ -96,6 +97,12 @@ class VoucherForm
                             }
                         }
                     ]),
+                DatePicker::make('tanggal_mulai')
+                    ->label('Tanggal Mulai')
+                    ->required(),
+                DatePicker::make('tanggal_selesai')
+                    ->label('Tanggal Selesai')
+                    ->required(),
             ]);
     }
 }

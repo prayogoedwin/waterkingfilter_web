@@ -28,7 +28,36 @@ class MemberVoucherForm
                                 $voucher->id => $voucher->name . ' (' . $voucher->tipe->tipe . ')'
                             ])
                     )
+                    ->live()
+                    ->afterStateHydrated(function ($state, callable $set) {
+
+                        $voucher = Voucher::find($state);
+
+                        if ($voucher) {
+                            $set('tanggal_mulai', $voucher->tanggal_mulai);
+                            $set('tanggal_selesai', $voucher->tanggal_selesai);
+                        }
+                    })
+                    ->afterStateUpdated(function ($state, callable $set) {
+
+                        $voucher = Voucher::find($state);
+
+                        if ($voucher) {
+                            $set('tanggal_mulai', $voucher->tanggal_mulai);
+                            $set('tanggal_selesai', $voucher->tanggal_selesai);
+                        } else {
+                            $set('tanggal_mulai', null);
+                            $set('tanggal_selesai', null);
+                        }
+                    })
                     ->required(),
+                DatePicker::make('tanggal_mulai')
+                    ->label('Tanggal Mulai')
+                    ->disabled(),
+
+                DatePicker::make('tanggal_selesai')
+                    ->label('Tanggal Selesai')
+                    ->disabled(),
                 Select::make('member_id')
                     ->label('Member Penerima Voucher')
                     // ->multiple()
