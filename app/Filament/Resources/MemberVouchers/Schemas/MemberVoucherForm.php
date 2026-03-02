@@ -25,7 +25,7 @@ class MemberVoucherForm
                             })
                             ->get()
                             ->mapWithKeys(fn($voucher) => [
-                                $voucher->id => $voucher->name . ' (' . $voucher->tipe->tipe . ')'
+                                $voucher->id => $voucher->name
                             ])
                     )
                     ->live()

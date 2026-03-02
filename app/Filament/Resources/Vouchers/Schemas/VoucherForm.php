@@ -22,11 +22,11 @@ class VoucherForm
             ->components([
                 TextInput::make('name')
                     ->required(),
-                Select::make('voucher_tipe_id')
-                    ->label('Tipe Voucher')
-                    ->options(VoucherTipe::query()->pluck('tipe', 'id'))
-                    ->required()
-                    ->searchable(),
+                // Select::make('voucher_tipe_id')
+                //     ->label('Tipe Voucher')
+                //     ->options(VoucherTipe::query()->pluck('tipe', 'id'))
+                //     ->required()
+                //     ->searchable(),
                 Select::make('voucher_jenis_id')
                     ->label('Jenis Voucher')
                     ->options(VoucherJenis::query()->pluck('jenis', 'id'))
