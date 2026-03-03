@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\IndexController;
 use App\Http\Controllers\API\PartnerAuthController;
+use App\Http\Controllers\API\PartnerController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\VoucherScanController;
 use Illuminate\Http\Request;
@@ -35,6 +36,13 @@ Route::prefix('partner')->group(function () {
         Route::post('update-password', [PartnerAuthController::class, 'updatePassword']);
         Route::post('voucher/scan', [VoucherScanController::class, 'scanBarcode']);
         Route::post('voucher/preview', [VoucherScanController::class, 'previewBarcode']);
+
+        Route::get('wallet', [PartnerController::class, 'wallet']);
+        Route::post('wallet/withdraw', [PartnerController::class, 'withdraw']);
+
+        // History
+        Route::get('wallet/history-keuangan', [PartnerController::class, 'historyKeuangan']);
+        Route::get('wallet/history-pendapatan', [PartnerController::class, 'historyPendapatan']);
     });
     Route::post('login', [PartnerAuthController::class, 'login']);
 });
