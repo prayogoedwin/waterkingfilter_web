@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\API\Controller;
 use App\Models\Partner;
+use App\Models\VoucherClaimHistory;
+use App\Models\VoucherPartnerDetail;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +13,32 @@ use Illuminate\Support\Facades\Hash;
 
 class PartnerAuthController extends Controller
 {
+    public function me(Request $request)
+    {
+        try {
+            $countVoucher = VoucherPartnerDetail::where('partner_id', $request->user()->id)->count();
+            $claim = VoucherClaimHistory::where('partner_id', $request->user()->id)->count();
+            $sisa = $countVoucher - $claim;
+            $profile = $request->user();
+            $data = [
+                'id' => $profile->id,
+                'name' => $profile->name,
+                'email' => $profile->email,
+                'photo' => $profile->image
+                    ? asset('storage/' . $profile->image)
+                    : null,
+            ];
+            return $this->ok([
+                'profile' => $data,
+                'jumlah_voucher' => $countVoucher,
+                'jumlah_claim' => $claim,
+                'sisa' => $sisa
+            ]);
+        } catch (\Throwable $th) {
+            return $this->error($th->getMessage());
+        }
+    }
+
     public function login(Request $request)
     {
         $request->validate([

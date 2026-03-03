@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\IndexController;
 use App\Http\Controllers\API\PartnerAuthController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\VoucherScanController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,11 +30,11 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::apiResource('product', ProductController::class);
 Route::prefix('partner')->group(function () {
     Route::middleware('auth:partner-api')->group(function () {
-        Route::get('me', function (Request $request) {
-            return $request->user();
-        });
+        Route::get('me', [PartnerAuthController::class, 'me']);
         Route::get('counting-partner', [IndexController::class, 'detailPartner']);
         Route::post('update-password', [PartnerAuthController::class, 'updatePassword']);
+        Route::post('voucher/scan', [VoucherScanController::class, 'scanBarcode']);
+        Route::post('voucher/preview', [VoucherScanController::class, 'previewBarcode']);
     });
     Route::post('login', [PartnerAuthController::class, 'login']);
 });

@@ -11,14 +11,8 @@ class VoucherClaimHistory extends Model
         'member_id',
         'partner_id',
         'invoice_id',
-        'voucher_name',
-        'voucher_jenis',
-        'voucher_value',
-        'dicount_amount',
-        'subtotal',
-        'total_before_discount',
-        'total_after_discount',
-        'claim_at',
+        'persentase_claim',
+        'nominal_claim'
     ];
 
     protected $casts = [

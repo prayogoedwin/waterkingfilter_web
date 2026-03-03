@@ -43,32 +43,24 @@ class IndexController extends Controller
             $perPage = min($request->per_page ?? 10, 50);
             $page = $request->page ?? 1;
 
-            $khusus = MemberVoucher::with('voucher.tipe', 'voucher.jenis')
+            $memberVouchers = MemberVoucher::with([
+                'voucher.jenis',
+                'voucher.waktuVoucher',
+            ])
                 ->where('member_id', $memberId)
-                ->get()
-                ->pluck('voucher');
-
-            $terbuka = Voucher::with('tipe', 'jenis')
-                ->whereHas('tipe', fn($q) => $q->where('tipe', 'terbuka'))
                 ->get();
 
-            $collection = $khusus
-                ->merge($terbuka)
-                ->unique('id')
-                ->values();
-
             $paginated = new LengthAwarePaginator(
-                $collection->forPage($page, $perPage)->values(),
-                $collection->count(),
+                $memberVouchers->forPage($page, $perPage)->values(),
+                $memberVouchers->count(),
                 $perPage,
                 $page,
                 ['path' => request()->url()]
             );
 
-            $paginated->getCollection()->transform(function ($voucher) {
-
+            $paginated->getCollection()->transform(function ($memberVoucher) {
+                $voucher = $memberVoucher->voucher;
                 $jenis = $voucher->jenis->jenis ?? null;
-                $tipe = $voucher->tipe->tipe ?? null;
 
                 $prefix = match ($jenis) {
                     'potongan_persentase' => '%',
@@ -87,13 +79,19 @@ class IndexController extends Controller
                 return [
                     'id' => $voucher->id,
                     'name' => $voucher->name,
-                    'tipe' => $tipe,
                     'jenis' => $jenis,
                     'value' => $voucher->value,
                     'prefix' => $prefix,
                     'display_value' => $displayValue,
-                    'start_date' => $voucher->tanggal_mulai,
-                    'end_date' => $voucher->tanggal_selesai,
+                    'start_date' => $voucher->start_date?->format('Y-m-d'),
+                    'end_date' => $voucher->end_date?->format('Y-m-d'),
+                    'waktu' => $voucher->waktuVoucher?->waktu,
+                    'waktu_description' => $voucher->waktu_description,
+                    'can_use_today' => $voucher->canBeUsedToday(),
+                    'is_active' => $voucher->isActive(),
+                    'barcode' => $memberVoucher->barcode,
+                    'claim_count' => $memberVoucher->claim_count,
+                    'last_claim_date' => $memberVoucher->last_claim_date,
                 ];
             });
 
