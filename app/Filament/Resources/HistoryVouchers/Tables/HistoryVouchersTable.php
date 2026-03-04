@@ -18,27 +18,27 @@ class HistoryVouchersTable
             ->columns([
                 TextColumn::make('voucher.name'),
                 TextColumn::make('member.name'),
-                TextColumn::make('claim_at')
+                TextColumn::make('created_at')
                     ->label('Tanggal Claim')
                     ->dateTime('d F Y'),
             ])
             ->filters([
                 //
             ])
-            ->recordActions([
-                Action::make('view_invoice')
-                    ->label('Lihat Invoice')
-                    ->icon('heroicon-o-eye')
-                    ->color('info')
-                    ->url(
-                        fn($record) => $record->invoice_id
-                            ? InvoiceResource::getUrl('view', ['record' => $record->invoice_id])
-                            : null
-                    )
-                    ->visible(fn($record) => $record->invoice_id !== null)
-                    ->openUrlInNewTab(),
-                // EditAction::make(),
-            ])
+            // ->recordActions([
+            //     Action::make('view_invoice')
+            //         ->label('Lihat Invoice')
+            //         ->icon('heroicon-o-eye')
+            //         ->color('info')
+            //         ->url(
+            //             fn($record) => $record->invoice_id
+            //                 ? InvoiceResource::getUrl('view', ['record' => $record->invoice_id])
+            //                 : null
+            //         )
+            //         ->visible(fn($record) => $record->invoice_id !== null)
+            //         ->openUrlInNewTab(),
+            //     // EditAction::make(),
+            // ])
             ->toolbarActions([
                 // BulkActionGroup::make([
                 //     DeleteBulkAction::make(),
