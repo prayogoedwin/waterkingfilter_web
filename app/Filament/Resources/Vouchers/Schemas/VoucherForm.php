@@ -110,7 +110,7 @@ class VoucherForm
                 Section::make('Waktu Penggunaan')
                     ->schema([
 
-                        Select::make('waktu_id')
+                        Select::make('waktu_voucher_id')
                             ->label('Tipe Waktu')
                             ->relationship('waktuVoucher', 'waktu')
                             ->getOptionLabelFromRecordUsing(fn($record) => $record->label)
@@ -130,7 +130,7 @@ class VoucherForm
                             ->label('Tanggal Penggunaan')
                             ->required()
                             ->visible(function (Get $get) {
-                                $waktuId = $get('waktu_id');
+                                $waktuId = $get('waktu_voucher_id');
                                 if (!$waktuId) return false;
                                 $waktu = WaktuVoucher::find($waktuId);
                                 return $waktu?->waktu === 'tanggal_fix';
@@ -142,7 +142,7 @@ class VoucherForm
                                 ->label('Tanggal Mulai')
                                 ->required()
                                 ->visible(function (Get $get) {
-                                    $waktuId = $get('waktu_id');
+                                    $waktuId = $get('waktu_voucher_id');
                                     if (!$waktuId) return false;
                                     $waktu = WaktuVoucher::find($waktuId);
                                     return $waktu?->waktu === 'periode_tanggal';
@@ -153,7 +153,7 @@ class VoucherForm
                                 ->required()
                                 ->after('period_start')
                                 ->visible(function (Get $get) {
-                                    $waktuId = $get('waktu_id');
+                                    $waktuId = $get('waktu_voucher_id');
                                     if (!$waktuId) return false;
                                     $waktu = WaktuVoucher::find($waktuId);
                                     return $waktu?->waktu === 'periode_tanggal';
@@ -168,7 +168,7 @@ class VoucherForm
                             ->gridDirection('row')
                             ->required()
                             ->visible(function (Get $get) {
-                                $waktuId = $get('waktu_id');
+                                $waktuId = $get('waktu_voucher_id');
                                 if (!$waktuId) return false;
                                 $waktu = WaktuVoucher::find($waktuId);
                                 return $waktu?->waktu === 'tanggal_tertentu';
@@ -190,7 +190,7 @@ class VoucherForm
                             ->columns(4)
                             ->required()
                             ->visible(function (Get $get) {
-                                $waktuId = $get('waktu_id');
+                                $waktuId = $get('waktu_voucher_id');
                                 if (!$waktuId) return false;
                                 $waktu = WaktuVoucher::find($waktuId);
                                 return $waktu?->waktu === 'hari_tertentu';
