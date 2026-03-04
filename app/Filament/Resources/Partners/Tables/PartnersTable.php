@@ -20,6 +20,7 @@ class PartnersTable
                     ->label('Nama Partner')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('alamat'),
                 ImageColumn::make('image')
                     ->disk('public')
                     ->visibility('public')

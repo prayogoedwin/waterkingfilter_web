@@ -24,6 +24,7 @@ class PartnerAuthController extends Controller
                 'id' => $profile->id,
                 'name' => $profile->name,
                 'email' => $profile->email,
+                'alamat' => $profile->alamat,
                 'photo' => $profile->image
                     ? asset('storage/' . $profile->image)
                     : null,
@@ -57,6 +58,7 @@ class PartnerAuthController extends Controller
                 'id' => $partner->id,
                 'name' => $partner->name,
                 'email' => $partner->email,
+                'alamat' => $partner->alamat,
                 'photo' => $partner->image
                     ? asset('storage/' . $partner->image)
                     : null,

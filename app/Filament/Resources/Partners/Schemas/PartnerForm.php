@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Partners\Schemas;
 
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -16,6 +17,7 @@ class PartnerForm
                 TextInput::make('email')->required()
                     ->email()
                     ->unique('partners', 'email'),
+                Textarea::make('alamat')->required(),
                 FileUpload::make('image')
                     ->image()
                     ->disk('public')

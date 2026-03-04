@@ -12,7 +12,7 @@ class CreatePartner extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['password'] = Hash::make('partner');
+        $data['password'] = Hash::make('partnerWater');
         return $data;
     }
 }
