@@ -62,6 +62,7 @@ class VoucherScanController extends Controller
             // VALIDASI 4: Cek apakah sudah di-claim hari ini (untuk voucher yang bisa di-claim sekali per hari)
             // OPSIONAL - sesuaikan business logic
             $claimToday = VoucherClaimHistory::where('member_id', $memberVoucher->member_id)
+                ->where('partner_id', $partner->id)
                 ->where('voucher_id', $voucher->id)
                 ->whereDate('created_at', now()->toDateString())
                 ->exists();
@@ -134,6 +135,21 @@ class VoucherScanController extends Controller
 
             $memberVoucher->load(['voucher.jenis', 'voucher.waktuVoucher', 'member']);
             $voucher = $memberVoucher->voucher;
+            $jenis = $voucher->jenis->jenis ?? null;
+
+            // Hitung prefix dan display_value
+            $prefix = match ($jenis) {
+                'potongan_persentase' => '%',
+                'potongan_nominal', 'cashback' => 'Rp',
+                default => ''
+            };
+
+            $displayValue = match ($jenis) {
+                'potongan_persentase' => $voucher->value . '%',
+                'potongan_nominal', 'cashback' => 'Rp ' . number_format($voucher->value, 0, ',', '.'),
+                'gratis' => 'Gratis',
+                default => $voucher->value
+            };
 
             return $this->ok([
                 'member' => [
@@ -142,9 +158,12 @@ class VoucherScanController extends Controller
                 ],
                 'voucher' => [
                     'id' => $voucher->id,
-                    'name' => $voucher->name,
-                    'jenis' => $voucher->jenis->jenis,
+                    'voucher_name' => $voucher->name,
+                    'jenis' => $jenis,
                     'value' => $voucher->value,
+                    'prefix' => $prefix,
+                    'display_value' => $displayValue,
+                    'waktu' => $voucher->waktuVoucher?->waktu,
                     'waktu_description' => $voucher->waktu_description,
                     'start_date' => $voucher->start_date?->format('d F Y'),
                     'end_date' => $voucher->end_date?->format('d F Y'),
