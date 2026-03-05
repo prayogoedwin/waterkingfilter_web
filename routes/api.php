@@ -22,6 +22,8 @@ Route::prefix('auth')->group(function () {
 });
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('profile', [AuthController::class, 'user']);
+    Route::put('profile', [AuthController::class, 'updateProfile']);
+    Route::put('profile/password', [AuthController::class, 'updatePassword']);
     Route::get('partner', [IndexController::class, 'partner']);
     Route::get('voucher', [IndexController::class, 'voucher']);
     Route::get('history-order', [IndexController::class, 'historyOrder']);

@@ -137,32 +137,40 @@ class IndexController extends Controller
             return $this->error($e->getMessage());
         }
     }
-
-    public function detailVoucher($id)
+    public function detailVoucher(Request $request, $id)
     {
         try {
-            $voucher = VoucherPartnerDetail::with('voucher.jenis')
+            $memberId = $request->user()->id;
+
+            $vouchers = VoucherPartnerDetail::with([
+                'voucher.jenis',
+                'voucher.waktuVoucher'
+            ])
                 ->where('partner_id', $id)
                 ->get()
-                ->map(function ($voucherPartner) {
+                ->map(function ($voucherPartner) use ($memberId) {
                     $voucher = $voucherPartner->voucher;
                     $jenis = $voucher->jenis->jenis ?? null;
 
                     $prefix = match ($jenis) {
                         'potongan_persentase' => '%',
-                        'potongan_nominal' => 'Rp',
-                        'gratis' => '',
-                        'cashback' => 'Rp',
+                        'potongan_nominal', 'cashback' => 'Rp',
                         default => ''
                     };
 
                     $displayValue = match ($jenis) {
                         'potongan_persentase' => $voucher->value . '%',
-                        'potongan_nominal' => 'Rp ' . number_format($voucher->value, 0, ',', '.'),
-                        'cashback' => 'Rp ' . number_format($voucher->value, 0, ',', '.'),
+                        'potongan_nominal', 'cashback' => 'Rp ' . number_format($voucher->value, 0, ',', '.'),
                         'gratis' => 'Gratis',
                         default => $voucher->value
                     };
+
+                    // Cek apakah member memiliki voucher ini
+                    $memberVoucher = MemberVoucher::where('member_id', $memberId)
+                        ->where('voucher_id', $voucher->id)
+                        ->first();
+
+                    $isMemberOwned = $memberVoucher !== null;
 
                     return [
                         'id' => $voucherPartner->id,
@@ -173,12 +181,20 @@ class IndexController extends Controller
                         'value' => $voucher->value,
                         'prefix' => $prefix,
                         'display_value' => $displayValue,
+                        'waktu' => $voucher->waktuVoucher?->waktu,
+                        'waktu_description' => $voucher->waktu_description,
+                        'start_date' => $voucher->start_date?->format('Y-m-d'),
+                        'end_date' => $voucher->end_date?->format('Y-m-d'),
+                        'can_use_today' => $voucher->canBeUsedToday(),
+                        'is_active' => $voucher->isActive(),
+                        'is_member_owned' => $isMemberOwned,
+                        'barcode' => $isMemberOwned ? $memberVoucher->barcode : null,
                         'created_at' => $voucherPartner->created_at,
                         'updated_at' => $voucherPartner->updated_at,
                     ];
                 });
 
-            return $this->ok($voucher);
+            return $this->ok($vouchers);
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
