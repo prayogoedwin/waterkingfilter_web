@@ -95,7 +95,6 @@ class AuthController extends Controller
                 'name' => $member->name,
                 'email' => $member->email,
                 'phone' => $member->phone ?? null,
-                'address' => $member->address ?? null,
                 'created_at' => $member->created_at->format('d F Y'),
             ]);
         } catch (Exception $e) {
