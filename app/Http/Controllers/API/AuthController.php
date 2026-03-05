@@ -118,7 +118,7 @@ class AuthController extends Controller
 
             $member->update([
                 'name' => $request->name,
-                'phone' => $request->phone,
+                'whatsapp' => $request->whatsapp,
                 'address' => $request->address,
             ]);
 
