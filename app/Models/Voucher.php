@@ -4,9 +4,20 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Voucher extends Model
 {
+    use LogsActivity;
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll() // Log semua atribut
+            ->logOnlyDirty() // Hanya log field yang berubah
+            ->dontSubmitEmptyLogs() // Skip jika tidak ada perubahan
+            ->setDescriptionForEvent(fn(string $eventName) => "Voucher {$eventName}");
+    }
     protected $guarded = ['id'];
 
     protected $casts = [

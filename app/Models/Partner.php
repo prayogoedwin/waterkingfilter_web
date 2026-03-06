@@ -4,12 +4,22 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 // use Illuminate\Database\Eloquent\Model;
 
 class Partner extends Authenticatable
 {
-    use HasApiTokens;
+    use HasApiTokens, LogsActivity;
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll() // Log semua atribut
+            ->logOnlyDirty() // Hanya log field yang berubah
+            ->dontSubmitEmptyLogs() // Skip jika tidak ada perubahan
+            ->setDescriptionForEvent(fn(string $eventName) => "Partner {$eventName}");
+    }
     protected $guarded = ['id'];
 
     protected $hidden = [
