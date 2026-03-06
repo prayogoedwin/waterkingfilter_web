@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Partners\Tables;
 
+use App\Filament\Resources\Partners\PartnerResource;
+use App\Models\Partner;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -10,7 +12,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -22,15 +23,20 @@ class PartnersTable
     {
         return $table
             ->columns([
+                ImageColumn::make('image')
+                    ->disk('public')
+                    ->visibility('public')
+                    ->square(),
                 TextColumn::make('name')
                     ->label('Nama Partner')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('alamat'),
-                ImageColumn::make('image')
-                    ->disk('public')
-                    ->visibility('public')
-                    ->square(),
+                TextColumn::make('saldo_wallet')
+                    ->label('Wallet Saat Ini')
+                    ->money('IDR', locale: 'id')
+                    ->badge()
+                    ->color('success'),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
@@ -87,6 +93,15 @@ class PartnersTable
                             ->success()
                             ->send();
                     }),
+                Action::make('history_keuangan')
+                    ->label('History Keuangan')
+                    ->icon('heroicon-o-banknotes')
+                    ->color('info')
+                    ->url(
+                        fn(Partner $record): string =>
+                        PartnerResource::getUrl('edit', ['record' => $record->id]) . '?activeRelationManager=0'
+                    )
+                    ->openUrlInNewTab(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

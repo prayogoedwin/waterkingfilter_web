@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Partners;
 use App\Filament\Resources\Partners\Pages\CreatePartner;
 use App\Filament\Resources\Partners\Pages\EditPartner;
 use App\Filament\Resources\Partners\Pages\ListPartners;
+use App\Filament\Resources\Partners\RelationManagers\HistoryKeuanganRelationManager;
 use App\Filament\Resources\Partners\Schemas\PartnerForm;
 use App\Filament\Resources\Partners\Tables\PartnersTable;
 use App\Models\Partner;
@@ -73,7 +74,7 @@ class PartnerResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            HistoryKeuanganRelationManager::class
         ];
     }
 
