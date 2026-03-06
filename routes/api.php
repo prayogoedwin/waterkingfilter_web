@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('history-order', [IndexController::class, 'historyOrder']);
     Route::get('history-voucher', [IndexController::class, 'historyVoucher']);
     Route::get('detail-voucher/{id}', [IndexController::class, 'detailVoucher']);
+    Route::get('detail/{id}', [IndexController::class, 'detail']);
 });
 Route::apiResource('product', ProductController::class);
 Route::prefix('partner')->group(function () {

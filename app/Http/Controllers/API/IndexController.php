@@ -137,6 +137,52 @@ class IndexController extends Controller
             return $this->error($e->getMessage());
         }
     }
+
+    public function detail($id)
+    {
+        try {
+            $voucher = Voucher::with(['jenis', 'waktuVoucher'])->find($id);
+
+            if (!$voucher) {
+                return $this->error('Voucher tidak ditemukan', 404);
+            }
+
+            $jenis = $voucher->jenis->jenis ?? null;
+
+            $prefix = match ($jenis) {
+                'potongan_persentase' => '%',
+                'potongan_nominal', 'cashback' => 'Rp',
+                default => ''
+            };
+
+            $displayValue = match ($jenis) {
+                'potongan_persentase' => $voucher->value . '%',
+                'potongan_nominal', 'cashback' => 'Rp ' . number_format($voucher->value, 0, ',', '.'),
+                'gratis' => 'Gratis',
+                default => $voucher->value
+            };
+
+            $data = [
+                'id' => $voucher->id,
+                'name' => $voucher->name,
+                'jenis' => $jenis,
+                'value' => $voucher->value,
+                'prefix' => $prefix,
+                'display_value' => $displayValue,
+                'start_date' => $voucher->tanggal_mulai?->format('Y-m-d'),
+                'end_date' => $voucher->tanggal_selesai?->format('Y-m-d'),
+                'waktu' => $voucher->waktuVoucher?->waktu,
+                'waktu_description' => $voucher->waktu_description,
+                'can_use_today' => $voucher->canBeUsedToday(),
+                'is_active' => $voucher->isActive(),
+            ];
+
+            return $this->ok($data);
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
     public function detailVoucher(Request $request, $id)
     {
         try {
