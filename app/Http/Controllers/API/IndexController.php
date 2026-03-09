@@ -12,6 +12,7 @@ use App\Models\VoucherPartnerDetail;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -134,6 +135,7 @@ class IndexController extends Controller
             $voucherHistory = VoucherClaimHistory::with('voucher', 'invoice')->where('member_id', $request->user()->id)->get();
             return $this->ok($voucherHistory);
         } catch (Exception $e) {
+            Log::error('Error History Voucher: ' . $e->getMessage());
             return $this->error($e->getMessage());
         }
     }
