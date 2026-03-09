@@ -25,7 +25,7 @@ class ActivityResource extends Resource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-     //setting letak grup menu
+    //setting letak grup menu
     protected static string | \UnitEnum | null $navigationGroup = 'Sistem';
     protected static ?int $navigationSort = 1; // Urutan setelah Kategori
 
@@ -33,7 +33,7 @@ class ActivityResource extends Resource
     protected static ?string $modelLabel = 'Log Admin';
     protected static ?string $pluralModelLabel = 'Log Admin';
 
-     public static function canAccess(): bool
+    public static function canAccess(): bool
     {
         return auth()->check() && auth()->user()->can('view activity_log');
     }
@@ -90,7 +90,7 @@ class ActivityResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'default' => 'gray',
                         'auth' => 'success',
                         'user' => 'info',
@@ -112,7 +112,7 @@ class ActivityResource extends Resource
                 TextColumn::make('event')
                     ->label('Event')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'created' => 'success',
                         'updated' => 'warning',
                         'deleted' => 'danger',
@@ -123,7 +123,7 @@ class ActivityResource extends Resource
 
                 TextColumn::make('subject_type')
                     ->label('Subject Type')
-                    ->formatStateUsing(fn ($state) => class_basename($state))
+                    ->formatStateUsing(fn($state) => class_basename($state))
                     ->sortable(),
 
                 TextColumn::make('subject_id')
@@ -141,7 +141,7 @@ class ActivityResource extends Resource
 
                 TextColumn::make('causer_type')
                     ->label('Causer Type')
-                    ->formatStateUsing(fn ($state) => $state ? class_basename($state) : 'System')
+                    ->formatStateUsing(fn($state) => $state ? class_basename($state) : 'System')
                     ->sortable(),
 
                 TextColumn::make('batch_uuid')
@@ -157,7 +157,7 @@ class ActivityResource extends Resource
                     ->dateTime('Y-m-d H:i:s')
                     ->sortable()
                     ->since()
-                    ->tooltip(fn ($state) => $state->format('Y-m-d H:i:s')),
+                    ->tooltip(fn($state) => $state->format('Y-m-d H:i:s')),
 
                 TextColumn::make('updated_at')
                     ->label('Updated At')
@@ -165,6 +165,7 @@ class ActivityResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('id', 'desc')
             ->filters([
                 //
             ])
@@ -181,8 +182,8 @@ class ActivityResource extends Resource
                             $html .= "<strong class='text-sm text-gray-700 uppercase'>{$key}</strong>";
 
                             if (is_array($value)) {
-                                $html .= '<pre class="text-xs bg-gray-100 p-2 rounded mt-1 overflow-x-auto" style="background-color:#000">' 
-                                    . json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) 
+                                $html .= '<pre class="text-xs bg-gray-100 p-2 rounded mt-1 overflow-x-auto" style="background-color:#000">'
+                                    . json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
                                     . '</pre>';
                             } else {
                                 $html .= '<div class="text-sm text-gray-800">' . e($value) . '</div>';
