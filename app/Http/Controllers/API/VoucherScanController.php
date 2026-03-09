@@ -8,6 +8,7 @@ use App\Models\VoucherClaimHistory;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class VoucherScanController extends Controller
 {
@@ -176,6 +177,54 @@ class VoucherScanController extends Controller
             ]);
         } catch (Exception $e) {
             return $this->error('Terjadi kesalahan: ' . $e->getMessage(), 500);
+        }
+    }
+
+    public function historyVoucher(Request $request)
+    {
+        try {
+            $partnerId = $request->user()->id;
+
+            $history = VoucherClaimHistory::with(['voucher.jenis'])
+                ->where('partner_id', $partnerId)
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($claim) {
+                    $voucher = $claim->voucher;
+                    $jenis = $voucher->jenis->jenis ?? null;
+
+                    $prefix = match ($jenis) {
+                        'potongan_persentase' => '%',
+                        'potongan_nominal', 'cashback' => 'Rp',
+                        default => ''
+                    };
+
+                    $displayValue = match ($jenis) {
+                        'potongan_persentase' => $voucher->value . '%',
+                        'potongan_nominal', 'cashback' => 'Rp ' . number_format($voucher->value, 0, ',', '.'),
+                        'gratis' => 'Gratis',
+                        default => $voucher->value
+                    };
+
+                    return [
+                        'id' => $claim->id,
+                        'voucher_id' => $voucher->id,
+                        'voucher_name' => $voucher->name,
+                        'jenis' => $jenis,
+                        'value' => $voucher->value,
+                        'prefix' => $prefix,
+                        'display_value' => $displayValue,
+                        'persentase_claim' => $claim->persentase_claim,
+                        'nominal_claim' => $claim->nominal_claim,
+                        'formatted_nominal' => 'Rp ' . number_format($claim->nominal_claim, 0, ',', '.'),
+                        'claimed_at' => $claim->created_at->format('d F Y H:i'),
+                    ];
+                });
+
+            return $this->ok($history);
+        } catch (Exception $e) {
+            Log::error('Error History Voucher Partner: ' . $e->getMessage());
+            return $this->error($e->getMessage());
         }
     }
 }

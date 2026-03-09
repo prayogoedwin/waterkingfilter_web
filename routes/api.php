@@ -39,7 +39,7 @@ Route::prefix('partner')->group(function () {
         Route::post('update-password', [PartnerAuthController::class, 'updatePassword']);
         Route::post('voucher/scan', [VoucherScanController::class, 'scanBarcode']);
         Route::post('voucher/preview', [VoucherScanController::class, 'previewBarcode']);
-
+        Route::get('history-voucher', [VoucherScanController::class, 'historyVoucher']);
         Route::get('wallet', [PartnerController::class, 'wallet']);
         Route::post('wallet/withdraw', [PartnerController::class, 'withdraw']);
 
