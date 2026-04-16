@@ -32,6 +32,12 @@ class PartnersTable
                     ->label('Nama Partner')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('settlement_method')
+                    ->label('Tipe Settlement')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => Partner::settlementMethodOptions()[$state ?? Partner::SETTLEMENT_POSTPAID] ?? 'Postpaid (dicairkan akhir)')
+                    ->color(fn (?string $state): string => ($state ?? Partner::SETTLEMENT_POSTPAID) === Partner::SETTLEMENT_PREPAID ? 'info' : 'warning')
+                    ->sortable(),
                 TextColumn::make('alamat'),
                 TextColumn::make('saldo_wallet')
                     ->label('Wallet Saat Ini')
