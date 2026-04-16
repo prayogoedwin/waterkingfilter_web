@@ -6,6 +6,7 @@ use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
 use App\Filament\Widgets\WebInfoWidget;
 use App\Filament\Widgets\MaintenanceToggle;
+use App\Filament\Widgets\WithdrawalRequestStats;
 use App\Filament\Resources\ClearCacheWidgetResource\Widgets\ClearCacheWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -51,6 +52,7 @@ class BackendPanelProvider extends PanelProvider
                 WebInfoWidget::class,
                 MaintenanceToggle::class,
                 ClearCacheWidget::class,
+                WithdrawalRequestStats::class,
 
             ])
             ->navigationGroups([

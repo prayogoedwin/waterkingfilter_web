@@ -61,7 +61,8 @@ class PartnerController extends Controller
                 $historyKeuangan = HistoryKeuanganPartner::create([
                     'partner_id' => $partner->id,
                     'nominal' => $nominal,
-                    'status' => 'withdrawal',
+                    'tipe' => 'withdrawal',
+                    'status' => HistoryKeuanganPartner::STATUS_MENUNGGU,
                     'keterangan' => $request->keterangan ?? 'Penarikan saldo wallet',
                 ]);
 
@@ -102,7 +103,7 @@ class PartnerController extends Controller
                     'id' => $item->id,
                     'nominal' => $item->nominal,
                     'status' => $item->status,
-                    'status_label' => $item->status === 'withdrawal' ? 'Penarikan' : 'Top Up',
+                    'status_label' => HistoryKeuanganPartner::statusOptions()[$item->status] ?? $item->status,
                     'keterangan' => $item->keterangan,
                     'tanggal' => $item->created_at->format('d F Y H:i'),
                     'formatted_nominal' => 'Rp ' . number_format($item->nominal, 0, ',', '.'),

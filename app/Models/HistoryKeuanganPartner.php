@@ -9,6 +9,10 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class HistoryKeuanganPartner extends Model
 {
     use LogsActivity;
+    public const STATUS_MENUNGGU = 'menunggu';
+    public const STATUS_PROSES = 'proses';
+    public const STATUS_TERBAYAR = 'terbayar';
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -18,6 +22,20 @@ class HistoryKeuanganPartner extends Model
             ->setDescriptionForEvent(fn(string $eventName) => "History Keuangan Partner {$eventName}");
     }
     protected $guarded = ['id'];
+
+    public static function statusOptions(): array
+    {
+        return [
+            self::STATUS_MENUNGGU => 'Menunggu',
+            self::STATUS_PROSES => 'Proses',
+            self::STATUS_TERBAYAR => 'Terbayar',
+        ];
+    }
+
+    public static function statusHelper(): string
+    {
+        return 'Menunggu: request baru masuk, Proses: sedang diproses admin, Terbayar: withdrawal selesai dibayarkan.';
+    }
 
     public function partner()
     {

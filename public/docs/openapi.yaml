@@ -496,6 +496,57 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ApiSuccess" }
 
+  /partner/voucher/claimed-history:
+    get:
+      tags: [Partner Voucher]
+      summary: History voucher yang di-claim di partner login
+      description: |
+        Endpoint ini otomatis terikat ke partner yang sedang login (`auth:partner-api`),
+        jadi hasil hanya menampilkan history claim untuk 1 partner tersebut.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List history claim voucher partner login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Berhasil memuat history voucher partner
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nama_voucher:
+                          type: string
+                          example: Potongan Member Rp. 20.000
+                        tipe_voucher:
+                          type: string
+                          enum: [persen, nominal]
+                          example: nominal
+                        tanggal_claim_voucher:
+                          type: string
+                          example: 06 Maret 2026 15:30
+                        nominal_voucher_full:
+                          type: integer
+                          example: 5000
+                        nominal_voucher_singkat:
+                          type: string
+                          example: 5K
+                        siapa_yang_claim:
+                          type: string
+                          example: altair
+
   /partner/wallet:
     get:
       tags: [Partner Wallet]

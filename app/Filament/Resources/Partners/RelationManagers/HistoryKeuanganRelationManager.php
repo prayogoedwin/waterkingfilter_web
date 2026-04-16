@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Partners\RelationManagers;
 
+use App\Models\HistoryKeuanganPartner;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -69,8 +70,16 @@ class HistoryKeuanganRelationManager extends RelationManager
                 TextColumn::make('nominal')
                     ->label('Nominal')
                     ->formatStateUsing(fn($state) => 'Rp ' . number_format($state, 0, ',', '.'))
-                    ->sortable()
-                    ->color(fn($record) => $record->status === 'withdrawal' ? 'danger' : 'success'),
+                    ->sortable(),
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => HistoryKeuanganPartner::statusOptions()[$state] ?? $state)
+                    ->color(fn (string $state): string => match ($state) {
+                        HistoryKeuanganPartner::STATUS_MENUNGGU => 'gray',
+                        HistoryKeuanganPartner::STATUS_PROSES => 'warning',
+                        HistoryKeuanganPartner::STATUS_TERBAYAR => 'success',
+                    }),
 
                 TextColumn::make('created_at')
                     ->label('Tanggal')

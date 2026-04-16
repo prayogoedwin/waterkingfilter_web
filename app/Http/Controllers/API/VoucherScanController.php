@@ -227,4 +227,57 @@ class VoucherScanController extends Controller
             return $this->error($e->getMessage());
         }
     }
+
+    public function claimedVoucherHistory(Request $request)
+    {
+        try {
+            $partnerId = $request->user()->id;
+
+            $history = VoucherClaimHistory::with(['voucher.jenis', 'member'])
+                ->where('partner_id', $partnerId)
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($claim) {
+                    $voucher = $claim->voucher;
+                    $jenis = $voucher->jenis->jenis ?? null;
+                    $tipeVoucher = $jenis === 'potongan_persentase' ? 'persen' : 'nominal';
+
+                    return [
+                        'nama_voucher' => $voucher->name,
+                        'tipe_voucher' => $tipeVoucher,
+                        'tanggal_claim_voucher' => $claim->created_at->format('d F Y H:i'),
+                        'nominal_voucher_full' => (int) $voucher->value,
+                        'nominal_voucher_singkat' => $this->formatVoucherValueShort($voucher->value, $jenis),
+                        'siapa_yang_claim' => $claim->member->name ?? '-',
+                    ];
+                })
+                ->values();
+
+            return $this->ok($history, 'Berhasil memuat history voucher partner');
+        } catch (Exception $e) {
+            Log::error('Error Claimed Voucher History Partner: ' . $e->getMessage());
+            return $this->error($e->getMessage());
+        }
+    }
+
+    private function formatVoucherValueShort(int|float|string $value, ?string $jenis): string
+    {
+        $numericValue = (int) $value;
+
+        if ($jenis === 'potongan_persentase') {
+            return $numericValue . '%';
+        }
+
+        if ($numericValue >= 1000000) {
+            $short = $numericValue / 1000000;
+            return rtrim(rtrim(number_format($short, 1, '.', ''), '0'), '.') . 'M';
+        }
+
+        if ($numericValue >= 1000) {
+            $short = $numericValue / 1000;
+            return rtrim(rtrim(number_format($short, 1, '.', ''), '0'), '.') . 'K';
+        }
+
+        return (string) $numericValue;
+    }
 }
