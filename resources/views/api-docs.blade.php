@@ -19,7 +19,7 @@
     <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
     <script>
         window.ui = SwaggerUIBundle({
-            url: "{{ asset('docs/openapi.yaml') }}",
+            url: "{{ route('api.docs.spec') }}",
             dom_id: '#swagger-ui',
             deepLinking: true,
             persistAuthorization: true,

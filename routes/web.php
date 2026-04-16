@@ -22,6 +22,21 @@ use App\Middleware\CheckMaintenanceMode;
 
 
 Route::view('/api/docs', 'api-docs')->name('api.docs');
+Route::get('/api/docs/spec', function () {
+    $path = base_path('public/docs/openapi.yaml');
+
+    if (!file_exists($path)) {
+        return response(
+            "OpenAPI spec file not found. Expected at: {$path}",
+            404,
+            ['Content-Type' => 'text/plain; charset=UTF-8']
+        );
+    }
+
+    return response(file_get_contents($path), 200, [
+        'Content-Type' => 'application/yaml; charset=UTF-8',
+    ]);
+})->name('api.docs.spec');
 
 // Route::get('/', function () {
 //     return view('welcome');
