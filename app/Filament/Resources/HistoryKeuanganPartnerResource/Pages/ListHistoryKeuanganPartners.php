@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\HistoryKeuanganPartnerResource\Pages;
 
 use App\Filament\Resources\HistoryKeuanganPartnerResource;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListHistoryKeuanganPartners extends ListRecords
@@ -11,7 +12,10 @@ class ListHistoryKeuanganPartners extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [];
+        return [
+            CreateAction::make()
+                ->label('Tambah Kredit Modal'),
+        ];
     }
 }
 

@@ -12,6 +12,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Partner extends Authenticatable
 {
     use HasApiTokens, LogsActivity;
+    public const SETTLEMENT_POSTPAID = 'postpaid';
+    public const SETTLEMENT_PREPAID = 'prepaid';
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -25,6 +28,14 @@ class Partner extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+    public static function settlementMethodOptions(): array
+    {
+        return [
+            self::SETTLEMENT_POSTPAID => 'Postpaid (dicairkan akhir)',
+            self::SETTLEMENT_PREPAID => 'Prepaid (pakai modal)',
+        ];
+    }
 
     public function vouchers()
     {
@@ -65,12 +76,21 @@ class Partner extends Authenticatable
         return $this->historyKeuangan()->topup()->sum('nominal');
     }
 
+    public function getTotalClaimDebitAttribute(): int
+    {
+        return $this->historyKeuangan()->claimDebit()->sum('nominal');
+    }
+
     /**
      * Hitung saldo wallet
      * Formula: (Total Pendapatan + Total Topup) - Total Withdrawal
      */
     public function getSaldoWalletAttribute(): int
     {
+        if (($this->settlement_method ?? self::SETTLEMENT_POSTPAID) === self::SETTLEMENT_PREPAID) {
+            return ($this->total_topup - $this->total_claim_debit) - $this->total_withdrawal;
+        }
+
         return ($this->total_pendapatan + $this->total_topup) - $this->total_withdrawal;
     }
 }

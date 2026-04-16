@@ -459,6 +459,9 @@ paths:
     post:
       tags: [Partner Voucher]
       summary: Claim voucher via barcode scan
+      description: |
+        Untuk partner `prepaid`, claim hanya berhasil jika saldo modal mencukupi.
+        Jika saldo tidak cukup, API akan return 400.
       security:
         - bearerAuth: []
       requestBody:
@@ -478,7 +481,7 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ApiSuccess" }
         "400":
-          description: Voucher tidak valid / tidak berlaku / sudah di-claim
+          description: Voucher tidak valid / tidak berlaku / sudah di-claim / saldo prepaid tidak cukup
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ApiError" }
@@ -551,11 +554,15 @@ paths:
     get:
       tags: [Partner Wallet]
       summary: Saldo wallet partner
+      description: |
+        Mendukung 2 mode settlement:
+        - `postpaid`: saldo dari akumulasi pendapatan claim yang dicairkan di akhir.
+        - `prepaid`: saldo dari kredit modal admin yang dipakai saat claim voucher.
       security:
         - bearerAuth: []
       responses:
         "200":
-          description: Ringkasan wallet
+          description: Ringkasan wallet + metode settlement partner
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ApiSuccess" }
@@ -564,6 +571,7 @@ paths:
     post:
       tags: [Partner Wallet]
       summary: Withdrawal saldo wallet partner
+      description: Hanya berlaku untuk partner dengan metode `postpaid`.
       security:
         - bearerAuth: []
       requestBody:
@@ -583,7 +591,7 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ApiSuccess" }
         "400":
-          description: Saldo tidak cukup / nominal tidak valid
+          description: Saldo tidak cukup / nominal tidak valid / partner prepaid tidak bisa withdrawal akhir
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ApiError" }
@@ -592,6 +600,7 @@ paths:
     get:
       tags: [Partner Wallet]
       summary: Riwayat keuangan partner (withdrawal/topup)
+      description: Menampilkan riwayat transaksi keuangan partner termasuk tipe transaksi.
       security:
         - bearerAuth: []
       parameters:
@@ -701,6 +710,10 @@ components:
         name: { type: string, example: Partner Medan }
         email: { type: string, format: email, example: partner@mail.com }
         alamat: { type: string, nullable: true, example: Medan }
+        settlement_method:
+          type: string
+          enum: [postpaid, prepaid]
+          example: postpaid
         photo: { type: string, nullable: true, example: "http://127.0.0.1:8000/storage/partners/image.png" }
 
     MemberAuthResponse:

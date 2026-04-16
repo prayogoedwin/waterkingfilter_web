@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\API\Controller;
+use App\Models\HistoryKeuanganPartner;
 use App\Models\MemberVoucher;
+use App\Models\Partner;
 use App\Models\VoucherClaimHistory;
 use Exception;
 use Illuminate\Http\Request;
@@ -85,6 +87,19 @@ class VoucherScanController extends Controller
                     $persentaseClaim = $voucher->value;
                 }
 
+                $settlementMethod = $partner->settlement_method ?? Partner::SETTLEMENT_POSTPAID;
+
+                if ($settlementMethod === Partner::SETTLEMENT_PREPAID) {
+                    $availableBalance = $partner->fresh()->saldo_wallet;
+
+                    if ($availableBalance < $nominalClaim) {
+                        return $this->error(
+                            'Saldo modal partner tidak mencukupi untuk claim voucher ini.',
+                            400
+                        );
+                    }
+                }
+
                 // Insert ke history claim
                 $historyClaim = VoucherClaimHistory::create([
                     'member_id' => $memberVoucher->member_id,
@@ -94,9 +109,15 @@ class VoucherScanController extends Controller
                     'nominal_claim' => $nominalClaim,
                 ]);
 
-                // TODO: Update wallet partner
-                // $partner->wallet += $nominalClaim;
-                // $partner->save();
+                if ($settlementMethod === Partner::SETTLEMENT_PREPAID) {
+                    HistoryKeuanganPartner::create([
+                        'partner_id' => $partner->id,
+                        'nominal' => $nominalClaim,
+                        'tipe' => HistoryKeuanganPartner::TIPE_CLAIM_DEBIT,
+                        'status' => HistoryKeuanganPartner::STATUS_TERBAYAR,
+                        'keterangan' => 'Debit otomatis dari scan voucher #' . $historyClaim->id,
+                    ]);
+                }
 
                 return $this->ok([
                     'message' => 'Voucher berhasil di-claim!',
@@ -108,6 +129,8 @@ class VoucherScanController extends Controller
                         'persentase_claim' => $persentaseClaim,
                         'nominal_claim' => $nominalClaim,
                         'total_transaction' => $totalTransaction,
+                        'settlement_method' => $settlementMethod,
+                        'saldo_partner_setelah_claim' => $partner->fresh()->saldo_wallet,
                         'claimed_at' => $historyClaim->created_at->format('d F Y H:i'),
                     ]
                 ]);

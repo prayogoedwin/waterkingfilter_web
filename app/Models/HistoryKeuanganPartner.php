@@ -9,6 +9,10 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class HistoryKeuanganPartner extends Model
 {
     use LogsActivity;
+    public const TIPE_WITHDRAWAL = 'withdrawal';
+    public const TIPE_TOPUP = 'topup';
+    public const TIPE_CLAIM_DEBIT = 'claim_debit';
+
     public const STATUS_MENUNGGU = 'menunggu';
     public const STATUS_PROSES = 'proses';
     public const STATUS_TERBAYAR = 'terbayar';
@@ -37,6 +41,15 @@ class HistoryKeuanganPartner extends Model
         return 'Menunggu: request baru masuk, Proses: sedang diproses admin, Terbayar: withdrawal selesai dibayarkan.';
     }
 
+    public static function tipeOptions(): array
+    {
+        return [
+            self::TIPE_WITHDRAWAL => 'Penarikan',
+            self::TIPE_TOPUP => 'Kredit Modal',
+            self::TIPE_CLAIM_DEBIT => 'Debit Claim Voucher',
+        ];
+    }
+
     public function partner()
     {
         return $this->belongsTo(Partner::class);
@@ -47,7 +60,7 @@ class HistoryKeuanganPartner extends Model
      */
     public function scopeWithdrawal($query)
     {
-        return $query->where('tipe', 'withdrawal');
+        return $query->where('tipe', self::TIPE_WITHDRAWAL);
     }
 
     /**
@@ -55,6 +68,11 @@ class HistoryKeuanganPartner extends Model
      */
     public function scopeTopup($query)
     {
-        return $query->where('tipe', 'topup');
+        return $query->where('tipe', self::TIPE_TOPUP);
+    }
+
+    public function scopeClaimDebit($query)
+    {
+        return $query->where('tipe', self::TIPE_CLAIM_DEBIT);
     }
 }

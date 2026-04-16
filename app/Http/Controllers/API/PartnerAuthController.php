@@ -25,6 +25,7 @@ class PartnerAuthController extends Controller
                 'name' => $profile->name,
                 'email' => $profile->email,
                 'alamat' => $profile->alamat,
+                'settlement_method' => $profile->settlement_method ?? Partner::SETTLEMENT_POSTPAID,
                 'photo' => $profile->image
                     ? asset('storage/' . $profile->image)
                     : null,
@@ -59,6 +60,7 @@ class PartnerAuthController extends Controller
                 'name' => $partner->name,
                 'email' => $partner->email,
                 'alamat' => $partner->alamat,
+                'settlement_method' => $partner->settlement_method ?? Partner::SETTLEMENT_POSTPAID,
                 'photo' => $partner->image
                     ? asset('storage/' . $partner->image)
                     : null,

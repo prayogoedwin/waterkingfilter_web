@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\HistoryKeuanganPartnerResource\Pages\EditHistoryKeuanganPartner;
 use App\Filament\Resources\HistoryKeuanganPartnerResource\Pages\ListHistoryKeuanganPartners;
+use App\Filament\Resources\HistoryKeuanganPartnerResource\Pages\CreateHistoryKeuanganPartner;
 use App\Models\HistoryKeuanganPartner;
 use App\Models\Partner;
 use Filament\Forms\Components\Select;
@@ -46,7 +47,7 @@ class HistoryKeuanganPartnerResource extends Resource
 
     public static function canCreate(): bool
     {
-        return false;
+        return auth()->check() && auth()->user()->can('edit partner');
     }
 
     public static function canEdit(Model $record): bool
@@ -68,11 +69,34 @@ class HistoryKeuanganPartnerResource extends Resource
     {
         return $schema
             ->components([
+                Select::make('partner_id')
+                    ->label('Partner')
+                    ->relationship('partner', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->visible(fn (string $operation): bool => $operation === 'create'),
+                Select::make('tipe')
+                    ->label('Jenis Transaksi')
+                    ->options([
+                        HistoryKeuanganPartner::TIPE_TOPUP => HistoryKeuanganPartner::tipeOptions()[HistoryKeuanganPartner::TIPE_TOPUP],
+                    ])
+                    ->default(HistoryKeuanganPartner::TIPE_TOPUP)
+                    ->required()
+                    ->visible(fn (string $operation): bool => $operation === 'create'),
+                \Filament\Forms\Components\TextInput::make('nominal')
+                    ->label('Nominal')
+                    ->numeric()
+                    ->required()
+                    ->minValue(1000)
+                    ->prefix('Rp')
+                    ->visible(fn (string $operation): bool => $operation === 'create'),
                 Select::make('status')
                     ->label('Status Withdrawal')
                     ->options(HistoryKeuanganPartner::statusOptions())
                     ->required()
-                    ->helperText(HistoryKeuanganPartner::statusHelper()),
+                    ->helperText(HistoryKeuanganPartner::statusHelper())
+                    ->visible(fn (string $operation): bool => $operation === 'edit'),
                 Textarea::make('keterangan')
                     ->label('Keterangan')
                     ->rows(3)
@@ -90,13 +114,11 @@ class HistoryKeuanganPartnerResource extends Resource
                     ->sortable(),
                 BadgeColumn::make('tipe')
                     ->label('Jenis')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'withdrawal' => 'Penarikan',
-                        'topup' => 'Top Up',
-                    })
+                    ->formatStateUsing(fn (string $state): string => HistoryKeuanganPartner::tipeOptions()[$state] ?? $state)
                     ->colors([
-                        'danger' => 'withdrawal',
-                        'success' => 'topup',
+                        'danger' => HistoryKeuanganPartner::TIPE_WITHDRAWAL,
+                        'success' => HistoryKeuanganPartner::TIPE_TOPUP,
+                        'info' => HistoryKeuanganPartner::TIPE_CLAIM_DEBIT,
                     ])
                     ->sortable(),
                 TextColumn::make('nominal')
@@ -121,10 +143,7 @@ class HistoryKeuanganPartnerResource extends Resource
                 SelectFilter::make('status')
                     ->options(HistoryKeuanganPartner::statusOptions()),
                 SelectFilter::make('tipe')
-                    ->options([
-                        'withdrawal' => 'Penarikan',
-                        'topup' => 'Top Up',
-                    ]),
+                    ->options(HistoryKeuanganPartner::tipeOptions()),
                 SelectFilter::make('partner_id')
                     ->label('Partner')
                     ->options(
@@ -139,9 +158,12 @@ class HistoryKeuanganPartnerResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->recordActions([
                 \Filament\Actions\EditAction::make()
-                    ->visible(fn (HistoryKeuanganPartner $record): bool => $record->tipe === 'withdrawal'),
+                    ->visible(fn (HistoryKeuanganPartner $record): bool => $record->tipe === HistoryKeuanganPartner::TIPE_WITHDRAWAL),
             ])
-            ->toolbarActions([]);
+            ->toolbarActions([
+                \Filament\Actions\CreateAction::make()
+                    ->label('Tambah Kredit Modal'),
+            ]);
     }
 
     public static function getRelations(): array
@@ -153,6 +175,7 @@ class HistoryKeuanganPartnerResource extends Resource
     {
         return [
             'index' => ListHistoryKeuanganPartners::route('/'),
+            'create' => CreateHistoryKeuanganPartner::route('/create'),
             'edit' => EditHistoryKeuanganPartner::route('/{record}/edit'),
         ];
     }

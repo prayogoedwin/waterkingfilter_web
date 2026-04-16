@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\API\Controller;
 use App\Models\HistoryKeuanganPartner;
+use App\Models\Partner;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,11 +19,16 @@ class PartnerController extends Controller
         try {
             $partner = $request->user();
 
+            $settlementMethod = $partner->settlement_method ?? Partner::SETTLEMENT_POSTPAID;
+
             return $this->ok([
                 'saldo' => $partner->saldo_wallet,
+                'settlement_method' => $settlementMethod,
+                'settlement_method_label' => Partner::settlementMethodOptions()[$settlementMethod] ?? $settlementMethod,
                 'detail' => [
                     'total_pendapatan' => $partner->total_pendapatan,
                     'total_topup' => $partner->total_topup,
+                    'total_claim_debit' => $partner->total_claim_debit,
                     'total_withdrawal' => $partner->total_withdrawal,
                 ],
             ]);
@@ -43,7 +49,12 @@ class PartnerController extends Controller
 
         try {
             $partner = $request->user();
+            $settlementMethod = $partner->settlement_method ?? Partner::SETTLEMENT_POSTPAID;
             $nominal = $request->nominal;
+
+            if ($settlementMethod === Partner::SETTLEMENT_PREPAID) {
+                return $this->error('Partner dengan metode prepaid tidak menggunakan fitur pencairan akhir.', 400);
+            }
 
             // Validasi: Cek saldo cukup
             if ($partner->saldo_wallet < $nominal) {
@@ -61,7 +72,7 @@ class PartnerController extends Controller
                 $historyKeuangan = HistoryKeuanganPartner::create([
                     'partner_id' => $partner->id,
                     'nominal' => $nominal,
-                    'tipe' => 'withdrawal',
+                    'tipe' => HistoryKeuanganPartner::TIPE_WITHDRAWAL,
                     'status' => HistoryKeuanganPartner::STATUS_MENUNGGU,
                     'keterangan' => $request->keterangan ?? 'Penarikan saldo wallet',
                 ]);
@@ -101,6 +112,8 @@ class PartnerController extends Controller
             $history->getCollection()->transform(function ($item) {
                 return [
                     'id' => $item->id,
+                    'tipe' => $item->tipe,
+                    'tipe_label' => HistoryKeuanganPartner::tipeOptions()[$item->tipe] ?? $item->tipe,
                     'nominal' => $item->nominal,
                     'status' => $item->status,
                     'status_label' => HistoryKeuanganPartner::statusOptions()[$item->status] ?? $item->status,
