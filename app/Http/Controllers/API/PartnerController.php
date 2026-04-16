@@ -20,11 +20,15 @@ class PartnerController extends Controller
             $partner = $request->user();
 
             $settlementMethod = $partner->settlement_method ?? Partner::SETTLEMENT_POSTPAID;
+            $prepaidBalance = ($partner->total_topup - $partner->total_claim_debit) - $partner->total_withdrawal;
+            $postpaidReceivable = $partner->total_pendapatan - $partner->total_withdrawal;
 
             return $this->ok([
                 'saldo' => $partner->saldo_wallet,
                 'settlement_method' => $settlementMethod,
                 'settlement_method_label' => Partner::settlementMethodOptions()[$settlementMethod] ?? $settlementMethod,
+                'prepaid_balance' => max($prepaidBalance, 0),
+                'postpaid_receivable' => max($postpaidReceivable, 0),
                 'detail' => [
                     'total_pendapatan' => $partner->total_pendapatan,
                     'total_topup' => $partner->total_topup,

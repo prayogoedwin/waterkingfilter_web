@@ -565,7 +565,52 @@ paths:
           description: Ringkasan wallet + metode settlement partner
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/ApiSuccess" }
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Berhasil memuat data
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      saldo:
+                        type: integer
+                        example: 100000
+                      settlement_method:
+                        type: string
+                        enum: [postpaid, prepaid]
+                        example: prepaid
+                      settlement_method_label:
+                        type: string
+                        example: Prepaid (pakai modal)
+                      prepaid_balance:
+                        type: integer
+                        example: 100000
+                      postpaid_receivable:
+                        type: integer
+                        example: 0
+                      detail:
+                        type: object
+                        properties:
+                          total_pendapatan:
+                            type: integer
+                            example: 200000
+                          total_topup:
+                            type: integer
+                            example: 150000
+                          total_claim_debit:
+                            type: integer
+                            example: 50000
+                          total_withdrawal:
+                            type: integer
+                            example: 25000
 
   /partner/wallet/withdraw:
     post:
