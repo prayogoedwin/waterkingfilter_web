@@ -45,6 +45,15 @@ class MemberVoucher extends Model
     }
 
     /**
+     * Kode sederhana untuk input manual partner.
+     * Format: C{id}
+     */
+    public function getCodeAttribute(): string
+    {
+        return 'C' . $this->id;
+    }
+
+    /**
      * Cek apakah voucher pernah di-claim (ada history)
      */
     public function hasBeenClaimed(): bool
@@ -95,5 +104,23 @@ class MemberVoucher extends Model
         }
 
         return null;
+    }
+
+    public static function findByCode(string $code): ?self
+    {
+        $normalized = strtoupper(trim($code));
+        $id = null;
+
+        if (str_starts_with($normalized, 'C')) {
+            $id = (int) substr($normalized, 1);
+        } elseif (is_numeric($normalized)) {
+            $id = (int) $normalized;
+        }
+
+        if (!$id) {
+            return null;
+        }
+
+        return self::find($id);
     }
 }

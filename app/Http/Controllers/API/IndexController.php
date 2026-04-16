@@ -91,6 +91,7 @@ class IndexController extends Controller
                     'can_use_today' => $voucher->canBeUsedToday(),
                     'is_active' => $voucher->isActive(),
                     'barcode' => $memberVoucher->barcode,
+                    'code' => $memberVoucher->code,
                     'claim_count' => $memberVoucher->claim_count,
                     'last_claim_date' => $memberVoucher->last_claim_date,
                 ];
@@ -237,6 +238,7 @@ class IndexController extends Controller
                         'is_active' => $voucher->isActive(),
                         'is_member_owned' => $isMemberOwned,
                         'barcode' => $isMemberOwned ? $memberVoucher->barcode : null,
+                        'code' => $isMemberOwned ? $memberVoucher->code : null,
                         'created_at' => $voucherPartner->created_at,
                         'updated_at' => $voucherPartner->updated_at,
                     ];
@@ -259,6 +261,28 @@ class IndexController extends Controller
                 'jumlah_claim' => $claim,
                 'sisa' => $sisa
             ]);
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function voucherCode(Request $request, int $voucherId)
+    {
+        try {
+            $memberVoucher = MemberVoucher::where('member_id', $request->user()->id)
+                ->where('voucher_id', $voucherId)
+                ->first();
+
+            if (!$memberVoucher) {
+                return $this->error('Voucher member tidak ditemukan', 404);
+            }
+
+            return $this->ok([
+                'voucher_id' => $voucherId,
+                'member_voucher_id' => $memberVoucher->id,
+                'code' => $memberVoucher->code,
+                'barcode' => $memberVoucher->barcode,
+            ], 'Berhasil memuat kode voucher');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }

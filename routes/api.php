@@ -30,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('history-voucher', [IndexController::class, 'historyVoucher']);
     Route::get('detail-voucher/{id}', [IndexController::class, 'detailVoucher']);
     Route::get('detail/{id}', [IndexController::class, 'detail']);
+    Route::get('voucher-code/{voucherId}', [IndexController::class, 'voucherCode']);
 });
 Route::apiResource('product', ProductController::class);
 Route::prefix('partner')->group(function () {
@@ -39,6 +40,8 @@ Route::prefix('partner')->group(function () {
         Route::post('update-password', [PartnerAuthController::class, 'updatePassword']);
         Route::post('voucher/scan', [VoucherScanController::class, 'scanBarcode']);
         Route::post('voucher/preview', [VoucherScanController::class, 'previewBarcode']);
+        Route::post('voucher/scan-code', [VoucherScanController::class, 'scanByCode']);
+        Route::post('voucher/preview-code', [VoucherScanController::class, 'previewByCode']);
         Route::get('history-voucher', [VoucherScanController::class, 'historyVoucher']);
         Route::get('voucher/claimed-history', [VoucherScanController::class, 'claimedVoucherHistory']);
         Route::get('wallet', [PartnerController::class, 'wallet']);

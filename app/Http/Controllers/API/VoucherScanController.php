@@ -14,13 +14,41 @@ use Illuminate\Support\Facades\Log;
 
 class VoucherScanController extends Controller
 {
+    public function scanByCode(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string',
+            'total_transaction' => 'required|integer|min:0',
+        ]);
+
+        $request->merge([
+            'barcode' => null,
+        ]);
+
+        return $this->scanBarcode($request);
+    }
+
+    public function previewByCode(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string',
+        ]);
+
+        $request->merge([
+            'barcode' => null,
+        ]);
+
+        return $this->previewBarcode($request);
+    }
+
     /**
      * Scan barcode voucher dan validasi
      */
     public function scanBarcode(Request $request)
     {
         $request->validate([
-            'barcode' => 'required|string',
+            'barcode' => 'nullable|string|required_without:code',
+            'code' => 'nullable|string|required_without:barcode',
             'total_transaction' => 'required|integer|min:0',
         ]);
 
@@ -28,11 +56,13 @@ class VoucherScanController extends Controller
             // Partner yang login
             $partner = $request->user();
 
-            // Decode barcode
-            $memberVoucher = MemberVoucher::findByBarcode($request->barcode);
+            $memberVoucher = $this->resolveMemberVoucherFromInput(
+                $request->input('barcode'),
+                $request->input('code')
+            );
 
             if (!$memberVoucher) {
-                return $this->error('Barcode tidak valid', 400);
+                return $this->error('Kode voucher tidak valid', 400);
             }
 
             // Load relasi
@@ -125,6 +155,7 @@ class VoucherScanController extends Controller
                         'id' => $historyClaim->id,
                         'member' => $memberVoucher->member->name,
                         'voucher' => $voucher->name,
+                        'code' => $memberVoucher->code,
                         'jenis' => $voucher->jenis->jenis,
                         'persentase_claim' => $persentaseClaim,
                         'nominal_claim' => $nominalClaim,
@@ -146,15 +177,19 @@ class VoucherScanController extends Controller
     public function previewBarcode(Request $request)
     {
         $request->validate([
-            'barcode' => 'required|string',
+            'barcode' => 'nullable|string|required_without:code',
+            'code' => 'nullable|string|required_without:barcode',
         ]);
 
         try {
             $partner = $request->user();
-            $memberVoucher = MemberVoucher::findByBarcode($request->barcode);
+            $memberVoucher = $this->resolveMemberVoucherFromInput(
+                $request->input('barcode'),
+                $request->input('code')
+            );
 
             if (!$memberVoucher) {
-                return $this->error('Barcode tidak valid', 400);
+                return $this->error('Kode voucher tidak valid', 400);
             }
 
             $memberVoucher->load(['voucher.jenis', 'voucher.waktuVoucher', 'member']);
@@ -194,6 +229,8 @@ class VoucherScanController extends Controller
                 ],
                 'claim_count' => $memberVoucher->claim_count,
                 'last_claim_date' => $memberVoucher->last_claim_date,
+                'code' => $memberVoucher->code,
+                'barcode' => $memberVoucher->barcode,
                 'can_use_today' => $voucher->canBeUsedToday(),
                 'is_active' => $voucher->isActive(),
                 'valid_for_partner' => $voucher->isValidForPartner($partner->id),
@@ -302,5 +339,18 @@ class VoucherScanController extends Controller
         }
 
         return (string) $numericValue;
+    }
+
+    private function resolveMemberVoucherFromInput(?string $barcode, ?string $code): ?MemberVoucher
+    {
+        if (filled($barcode)) {
+            return MemberVoucher::findByBarcode($barcode);
+        }
+
+        if (filled($code)) {
+            return MemberVoucher::findByCode($code);
+        }
+
+        return null;
     }
 }

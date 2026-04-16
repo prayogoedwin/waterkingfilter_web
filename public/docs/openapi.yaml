@@ -283,6 +283,55 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ApiError" }
 
+  /voucher-code/{voucherId}:
+    get:
+      tags: [Member Area]
+      summary: Ambil code voucher milik member login
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: voucherId
+          required: true
+          schema: { type: integer, example: 5 }
+      responses:
+        "200":
+          description: Berhasil mengambil code voucher
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Berhasil memuat kode voucher
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      voucher_id:
+                        type: integer
+                        example: 5
+                      member_voucher_id:
+                        type: integer
+                        example: 25
+                      code:
+                        type: string
+                        example: C25
+                      barcode:
+                        type: string
+                        example: MV-16-5-a7f0d2b95c60161b3f3c82f764b1d1c9
+        "404":
+          description: Voucher member tidak ditemukan
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiError" }
+
   /product:
     get:
       tags: [Product]
@@ -431,7 +480,7 @@ paths:
   /partner/voucher/preview:
     post:
       tags: [Partner Voucher]
-      summary: Preview voucher dari barcode
+      summary: Preview voucher dari barcode atau code
       security:
         - bearerAuth: []
       requestBody:
@@ -440,9 +489,16 @@ paths:
           application/json:
             schema:
               type: object
-              required: [barcode]
               properties:
-                barcode: { type: string, example: "WV-ABC123XYZ" }
+                barcode:
+                  type: string
+                  nullable: true
+                  example: "MV-16-5-a7f0d2b95c60161b3f3c82f764b1d1c9"
+                code:
+                  type: string
+                  nullable: true
+                  example: "C25"
+              description: "Isi salah satu: barcode atau code."
       responses:
         "200":
           description: Preview voucher berhasil
@@ -450,7 +506,7 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ApiSuccess" }
         "400":
-          description: Barcode tidak valid / voucher tidak valid
+          description: Kode voucher tidak valid / voucher tidak valid
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ApiError" }
@@ -458,7 +514,7 @@ paths:
   /partner/voucher/scan:
     post:
       tags: [Partner Voucher]
-      summary: Claim voucher via barcode scan
+      summary: Claim voucher via barcode scan atau input code
       description: |
         Untuk partner `prepaid`, claim hanya berhasil jika saldo modal mencukupi.
         Jika saldo tidak cukup, API akan return 400.
@@ -470,10 +526,18 @@ paths:
           application/json:
             schema:
               type: object
-              required: [barcode, total_transaction]
+              required: [total_transaction]
               properties:
-                barcode: { type: string, example: "WV-ABC123XYZ" }
+                barcode:
+                  type: string
+                  nullable: true
+                  example: "MV-16-5-a7f0d2b95c60161b3f3c82f764b1d1c9"
+                code:
+                  type: string
+                  nullable: true
+                  example: "C25"
                 total_transaction: { type: integer, minimum: 0, example: 250000 }
+              description: "Isi salah satu: barcode atau code."
       responses:
         "200":
           description: Voucher berhasil di-claim
@@ -482,6 +546,71 @@ paths:
               schema: { $ref: "#/components/schemas/ApiSuccess" }
         "400":
           description: Voucher tidak valid / tidak berlaku / sudah di-claim / saldo prepaid tidak cukup
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiError" }
+
+  /partner/voucher/preview-code:
+    post:
+      tags: [Partner Voucher]
+      summary: Preview voucher by code manual
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+                  example: C25
+      responses:
+        "200":
+          description: Preview voucher berhasil
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiSuccess" }
+        "400":
+          description: Kode voucher tidak valid / voucher tidak valid
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiError" }
+
+  /partner/voucher/scan-code:
+    post:
+      tags: [Partner Voucher]
+      summary: Claim voucher by code manual
+      description: |
+        Endpoint khusus input kode manual (tanpa scan barcode).
+        Untuk partner `prepaid`, claim hanya berhasil jika saldo modal mencukupi.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, total_transaction]
+              properties:
+                code:
+                  type: string
+                  example: C25
+                total_transaction:
+                  type: integer
+                  minimum: 0
+                  example: 250000
+      responses:
+        "200":
+          description: Voucher berhasil di-claim
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiSuccess" }
+        "400":
+          description: Kode voucher tidak valid / saldo prepaid tidak cukup / voucher tidak valid
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ApiError" }
