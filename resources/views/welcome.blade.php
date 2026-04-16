@@ -7,7 +7,7 @@
     <title>Waterking Filter - Solusi Filter Air Terbaik</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="icon" type="image/x-icon" href="{{ asset('img') }}/waterking-filter.png">
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/waterking-filter.png') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -1255,7 +1255,7 @@
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
         <a href="#" class="nav-logo">
-            <img src="{{ asset('img') }}/waterking-filter.png" alt="Waterking Filter">
+            <img src="{{ asset('img/waterking-filter.png') }}" alt="Waterking Filter">
         </a>
         <ul class="nav-menu" id="navMenu">
             <li><a href="#home" class="active">Home</a></li>
@@ -1308,7 +1308,7 @@
             <div class="hero-visual">
                 <div class="hero-image-wrapper">
                     <div class="hero-droplet">
-                        <img src="{{ asset('img') }}/waterking-filter.png" alt="Waterking Filter">
+                        <img src="{{ asset('img/waterking-filter.png') }}" alt="Waterking Filter">
                     </div>
                     <div class="hero-stats">
                         <div class="stat-item">
@@ -1560,7 +1560,7 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
-                <img src="{{ asset('img') }}/waterking-filter.png" alt="Waterking Filter">
+                <img src="{{ asset('img/waterking-filter.png') }}" alt="Waterking Filter">
                 <p>Solusi filter air terbaik untuk keluarga Indonesia. Menyediakan produk berkualitas dengan pelayanan
                     profesional.</p>
                 <div class="footer-social">

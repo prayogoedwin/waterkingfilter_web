@@ -21,6 +21,8 @@ use App\Middleware\CheckMaintenanceMode;
 
 
 
+Route::view('/api/docs', 'api-docs')->name('api.docs');
+
 // Route::get('/', function () {
 //     return view('welcome');
 // });
