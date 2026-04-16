@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Partners\Tables;
 
 use App\Filament\Resources\Partners\PartnerResource;
+use App\Filament\Resources\HistoryKeuanganPartnerResource;
 use App\Models\Partner;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -99,9 +100,11 @@ class PartnersTable
                     ->color('info')
                     ->url(
                         fn(Partner $record): string =>
-                        PartnerResource::getUrl('edit', ['record' => $record->id]) . '?activeRelationManager=0'
+                        HistoryKeuanganPartnerResource::getUrl('index', [
+                            'partner_id' => $record->id,
+                        ])
                     )
-                    ->openUrlInNewTab(),
+                    ->openUrlInNewTab(false),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

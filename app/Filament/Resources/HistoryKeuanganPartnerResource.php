@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\HistoryKeuanganPartnerResource\Pages\EditHistoryKeuanganPartner;
 use App\Filament\Resources\HistoryKeuanganPartnerResource\Pages\ListHistoryKeuanganPartners;
 use App\Models\HistoryKeuanganPartner;
+use App\Models\Partner;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
@@ -124,6 +125,16 @@ class HistoryKeuanganPartnerResource extends Resource
                         'withdrawal' => 'Penarikan',
                         'topup' => 'Top Up',
                     ]),
+                SelectFilter::make('partner_id')
+                    ->label('Partner')
+                    ->options(
+                        Partner::query()
+                            ->orderBy('name')
+                            ->pluck('name', 'id')
+                            ->toArray()
+                    )
+                    ->searchable()
+                    ->preload(),
             ])
             ->defaultSort('created_at', 'desc')
             ->recordActions([
@@ -148,7 +159,14 @@ class HistoryKeuanganPartnerResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with(['partner']);
+        $query = parent::getEloquentQuery()->with(['partner']);
+        $partnerId = request()->integer('partner_id');
+
+        if ($partnerId > 0) {
+            $query->where('partner_id', $partnerId);
+        }
+
+        return $query;
     }
 }
 
