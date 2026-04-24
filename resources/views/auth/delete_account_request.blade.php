@@ -2,12 +2,18 @@
 
 @section('content')
 <style>
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
   .delete-account-wrapper {
-    min-height: calc(100vh - 140px);
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px 16px;
+    padding: 28px 16px;
   }
 
   .delete-account-card {
@@ -31,6 +37,7 @@
 
   .form-label,
   .form-check-label {
+    display: block;
     color: #f3f3f3;
     font-size: 14px;
     margin-bottom: 6px;
@@ -40,23 +47,24 @@
     margin-bottom: 14px;
   }
 
-  .form-control,
-  .form-select {
+  .delete-account-card .form-control,
+  .delete-account-card select.form-control {
     background-color: #222;
     border: 1px solid #444;
     color: #fff;
     height: 44px;
     border-radius: 8px;
     font-size: 14px;
+    width: 100%;
   }
 
-  .form-select {
-    padding-top: 0;
-    padding-bottom: 0;
+  .delete-account-card select.form-control {
+    appearance: auto;
+    -webkit-appearance: menulist;
+    padding: 0 12px;
   }
 
-  .form-control:focus,
-  .form-select:focus {
+  .delete-account-card .form-control:focus {
     background-color: #222;
     color: #fff;
     border-color: #e5d8b0;
@@ -76,6 +84,18 @@
 
   .btn-submit:hover {
     background-color: #d6c79e;
+  }
+
+  .footer,
+  .footer .container,
+  .footer p {
+    text-align: center !important;
+  }
+
+  .footer {
+    margin-top: 0 !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
   }
 
   .form-check {
@@ -137,7 +157,7 @@
 
       <div class="form-group">
         <label class="form-label" for="account_type">Label akun</label>
-        <select class="form-select" id="account_type" name="account_type" required>
+        <select class="form-control" id="account_type" name="account_type" required>
           <option value="">Pilih label akun</option>
           <option value="member" {{ old('account_type') === 'member' ? 'selected' : '' }}>Member</option>
           <option value="partner" {{ old('account_type') === 'partner' ? 'selected' : '' }}>Partner</option>
