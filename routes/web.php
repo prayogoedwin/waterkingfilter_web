@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\MemberRegisterController;
 use App\Http\Controllers\Auth\MemberForgotPasswordController;
 use App\Http\Controllers\Auth\MemberResetPasswordController;
 use App\Http\Controllers\Auth\SocialLoginController;
+use App\Http\Controllers\Auth\DeleteAccountRequestController;
 
 
 
@@ -58,6 +59,9 @@ Route::middleware(CheckMaintenanceMode::class)->group(function () {
     Route::get('/login', function () {
         return redirect()->route('member.login');
     })->name('login');
+
+    Route::get('/hapus-akun', [DeleteAccountRequestController::class, 'showForm'])->name('account.delete.form');
+    Route::post('/hapus-akun', [DeleteAccountRequestController::class, 'submit'])->name('account.delete.submit');
 
     Route::get('/test-email', function () {
         \Illuminate\Support\Facades\Mail::raw('Ini hanya test email', function ($message) {
