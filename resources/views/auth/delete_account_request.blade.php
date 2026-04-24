@@ -2,26 +2,42 @@
 
 @section('content')
 <style>
+  .delete-account-wrapper {
+    min-height: calc(100vh - 140px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
   .delete-account-card {
     background-color: #111;
-    border-radius: 12px;
-    padding: 40px 30px;
-    max-width: 460px;
+    border-radius: 14px;
+    padding: 34px 30px 28px;
+    max-width: 520px;
     width: 100%;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-    margin: 40px auto;
+    border: 1px solid #2f2f2f;
   }
 
   .delete-account-card h2 {
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 1.2;
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 22px;
     color: #e5d8b0;
   }
 
   .form-label,
   .form-check-label {
     color: #f3f3f3;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
   }
 
   .form-control,
@@ -29,6 +45,14 @@
     background-color: #222;
     border: 1px solid #444;
     color: #fff;
+    height: 44px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .form-select {
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .form-control:focus,
@@ -41,21 +65,54 @@
 
   .btn-submit {
     width: 100%;
-    margin-top: 6px;
-    padding: 10px;
+    margin-top: 2px;
+    padding: 11px;
     border-radius: 8px;
-    font-weight: 600;
+    font-weight: 700;
     background-color: #e5d8b0;
     color: #000;
+    border: none;
   }
 
   .btn-submit:hover {
     background-color: #d6c79e;
   }
+
+  .form-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 14px 0;
+  }
+
+  .form-check .form-check-input {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    border-color: #777;
+    background-color: #111;
+  }
+
+  .form-check .form-check-input:checked {
+    background-color: #e5d8b0;
+    border-color: #e5d8b0;
+  }
+
+  @media (max-width: 576px) {
+    .delete-account-card {
+      padding: 26px 18px 20px;
+    }
+
+    .delete-account-card h2 {
+      font-size: 24px;
+      margin-bottom: 18px;
+    }
+  }
 </style>
 
-<div class="delete-account-card">
-  <h2>Permohonan Hapus Akun</h2>
+<div class="delete-account-wrapper">
+  <div class="delete-account-card">
+    <h2>Permohonan Hapus Akun</h2>
 
   @if($errors->any())
     <div class="alert alert-danger">
@@ -73,59 +130,62 @@
     </div>
   @endif
 
-  <form method="POST" action="{{ route('account.delete.submit') }}" id="deleteAccountForm">
-    @csrf
+    <form method="POST" action="{{ route('account.delete.submit') }}" id="deleteAccountForm">
+      @csrf
 
-    <input type="hidden" name="recaptcha_token" id="recaptcha_token" />
+      <input type="hidden" name="recaptcha_token" id="recaptcha_token" />
 
-    <div class="mb-3">
-      <label class="form-label" for="account_type">Label akun</label>
-      <select class="form-select" id="account_type" name="account_type" required>
-        <option value="">Pilih label akun</option>
-        <option value="member" {{ old('account_type') === 'member' ? 'selected' : '' }}>Member</option>
-        <option value="partner" {{ old('account_type') === 'partner' ? 'selected' : '' }}>Partner</option>
-      </select>
-    </div>
+      <div class="form-group">
+        <label class="form-label" for="account_type">Label akun</label>
+        <select class="form-select" id="account_type" name="account_type" required>
+          <option value="">Pilih label akun</option>
+          <option value="member" {{ old('account_type') === 'member' ? 'selected' : '' }}>Member</option>
+          <option value="partner" {{ old('account_type') === 'partner' ? 'selected' : '' }}>Partner</option>
+        </select>
+      </div>
 
-    <div class="mb-3">
-      <label class="form-label" for="email">Email</label>
-      <input
-        type="email"
-        class="form-control"
-        id="email"
-        name="email"
-        value="{{ old('email') }}"
-        required
-      />
-    </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          name="email"
+          value="{{ old('email') }}"
+          placeholder="Masukkan email akun"
+          required
+        />
+      </div>
 
-    <div class="mb-3">
-      <label class="form-label" for="password">Password</label>
-      <input
-        type="password"
-        class="form-control"
-        id="password"
-        name="password"
-        required
-      />
-    </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          name="password"
+          placeholder="Masukkan password akun"
+          required
+        />
+      </div>
 
-    <div class="form-check mb-3">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        value="1"
-        id="confirm_delete"
-        name="confirm_delete"
-        required
-      >
-      <label class="form-check-label" for="confirm_delete">
-        Konfirmasi hapus akun
-      </label>
-    </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          value="1"
+          id="confirm_delete"
+          name="confirm_delete"
+          required
+        >
+        <label class="form-check-label" for="confirm_delete">
+          Konfirmasi hapus akun
+        </label>
+      </div>
 
-    <button type="submit" class="btn btn-submit">Submit</button>
-  </form>
+      <button type="submit" class="btn btn-submit">Submit</button>
+    </form>
+  </div>
 </div>
 @endsection
 
