@@ -95,6 +95,24 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ApiError" }
 
+  /auth/account:
+    delete:
+      tags: [Member Auth]
+      summary: Hapus akun member (soft delete)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Akun member berhasil dihapus
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiSuccess" }
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiError" }
+
   /user:
     get:
       tags: [Utility]
@@ -463,6 +481,24 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ValidationErrorResponse" }
+
+  /partner/account:
+    delete:
+      tags: [Partner Auth]
+      summary: Hapus akun partner (soft delete)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Akun partner berhasil dihapus
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiSuccess" }
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiError" }
 
   /partner/counting-partner:
     get:

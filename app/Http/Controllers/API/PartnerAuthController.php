@@ -105,4 +105,22 @@ class PartnerAuthController extends Controller
             return $this->error($e->getMessage());
         }
     }
+
+    public function deleteAccount(Request $request)
+    {
+        try {
+            $partner = $request->user();
+
+            if (!$partner) {
+                return $this->error('Unauthorized', 401);
+            }
+
+            $partner->tokens()->delete();
+            $partner->delete();
+
+            return $this->ok(null, 'Akun partner berhasil dihapus');
+        } catch (\Throwable $th) {
+            return $this->error($th->getMessage());
+        }
+    }
 }

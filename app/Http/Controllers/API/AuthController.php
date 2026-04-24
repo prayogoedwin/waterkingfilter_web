@@ -179,4 +179,22 @@ class AuthController extends Controller
             return $this->error($th->getMessage());
         }
     }
+
+    public function deleteAccount(Request $request)
+    {
+        try {
+            $member = $request->user();
+
+            if (!$member) {
+                return $this->error('Unauthorized', 401);
+            }
+
+            $member->tokens()->delete();
+            $member->delete();
+
+            return $this->ok(null, 'Akun member berhasil dihapus');
+        } catch (\Throwable $th) {
+            return $this->error($th->getMessage());
+        }
+    }
 }

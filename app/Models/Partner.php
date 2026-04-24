@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
@@ -11,7 +12,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Partner extends Authenticatable
 {
-    use HasApiTokens, LogsActivity;
+    use HasApiTokens, LogsActivity, SoftDeletes;
     public const SETTLEMENT_POSTPAID = 'postpaid';
     public const SETTLEMENT_PREPAID = 'prepaid';
 

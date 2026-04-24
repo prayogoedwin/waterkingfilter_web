@@ -18,6 +18,7 @@ Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
+        Route::delete('account', [AuthController::class, 'deleteAccount']);
     });
 });
 Route::middleware('auth:sanctum')->group(function () {
@@ -38,6 +39,7 @@ Route::prefix('partner')->group(function () {
         Route::get('me', [PartnerAuthController::class, 'me']);
         Route::get('counting-partner', [IndexController::class, 'detailPartner']);
         Route::post('update-password', [PartnerAuthController::class, 'updatePassword']);
+        Route::delete('account', [PartnerAuthController::class, 'deleteAccount']);
         Route::post('voucher/scan', [VoucherScanController::class, 'scanBarcode']);
         Route::post('voucher/preview', [VoucherScanController::class, 'previewBarcode']);
         Route::post('voucher/scan-code', [VoucherScanController::class, 'scanByCode']);
